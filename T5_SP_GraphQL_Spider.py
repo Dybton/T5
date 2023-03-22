@@ -109,8 +109,12 @@ from functools import reduce
 print("my version of pl is " + pl.__version__)
 
 import transformers
+import pytorch_lightning
+
 print("my version of transformers is " + transformers.__version__)
 print ("my version of pytorch is " + torch.__version__)
+print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
+
 
 test_state = False
 tensorflow_active = False
@@ -161,7 +165,7 @@ class TextToGraphQLDataset(Dataset):
             tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, padding=True, truncation=True, return_tensors='pt')
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.encode_plus(element['query'],max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
+            tokenized_t = tokenizer.encode_plus(element['query'],max_length=block_size, padding='max_length', truncation=True, return_tensors='pt')
             self.target.append(tokenized_t)
             self.schema_ids.append(element['schemaId'])
 
@@ -231,7 +235,7 @@ class MaskGraphQLDataset(Dataset):
                   break
               encoded_source[pos] = tokenizer.mask_token_id
               decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id]))
-              encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, pad_to_max_length=True, truncation=True).squeeze()
+              encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, padding='max_length', truncation=True).squeeze()
               if encoded_target is not None and torch.numel(encoded_target) > 0:
                   self.target.append(encoded_target)
                   self.source.append(encoded_source)
@@ -330,13 +334,13 @@ class SpiderDataset(Dataset):
             db_with_question = 'translate English to SQL: ' + element['question'] + ' ' + tables_with_columns
             # question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']]) + ' </s>'
 
-            tokenized_s = tokenizer.batch_encode_plus([db_with_question],max_length=1024, pad_to_max_length=True, truncation=True,return_tensors='pt')
+            tokenized_s = tokenizer.batch_encode_plus([db_with_question],max_length=1024, padding='max_length', truncation=True,return_tensors='pt')
             # what is the largest example size?
             # the alternative is to collate
             #might need to collate
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.batch_encode_plus([element['query']],max_length=block_size, pad_to_max_length=True, truncation=True,return_tensors='pt')
+            tokenized_t = tokenizer.batch_encode_plus([element['query']],max_length=block_size, padding='max_length', truncation=True,return_tensors='pt')
             self.target.append(tokenized_t)
 
 
@@ -388,7 +392,7 @@ class CoSQLMaskDataset(Dataset):
               # the target will be that token. 
               utterance = interaction['query']
               # tokens = utterance.split()
-              encoded_source = tokenizer.encode(utterance, max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt').squeeze()
+              encoded_source = tokenizer.encode(utterance, max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
               token_count = encoded_source.shape[0]
               # print(encoded_source.shape)
               repeated_utterance = [encoded_source for _ in range(token_count)]
@@ -533,15 +537,17 @@ class T5MultiSPModel(pl.LightningModule):
 
   def validation_step(self, batch, batch_idx):
     loss = self._step(batch)
-      
-    # if self.task == 'finetune':
-    #   preds, target = self._generate_step(batch)
-    #   accuracy = exact_match.exact_match_accuracy(preds,target)
-    #   return {"val_loss": loss, "val_acc": torch.tensor(accuracy) }
-    # else:
+
+    print(f'Validation step called, batch_idx: {batch_idx}, loss: {loss.item()}')
+
     return {"val_loss": loss}
 
-  def on_validation_epoch_end(self, outputs):
+
+  def on_validation_epoch_end(self, outputs=None):
+    if not outputs:
+        print("Empty outputs list.")
+        return
+    print("outputs " + str(outputs))
     avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
     # if self.task == 'finetune':
     #   avg_acc = torch.stack([x["val_acc"] for x in outputs]).mean()
@@ -734,8 +740,7 @@ hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
 
 # # system = ConvBartSystem(dataset, train_sampler, batch_size=2)
 system = T5MultiSPModel(hyperparams,batch_size=32)
-print("system")
-# # system.lr = 3e-4
+print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 
 
 # # In[47]:
