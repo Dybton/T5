@@ -113,7 +113,7 @@ print("my version of transformers is " + transformers.__version__)
 print ("my version of pytorch is " + torch.__version__)
 
 test_state = False
-tensorflow_active = True
+tensorflow_active = False
 
 # # # Prepare GraphQL Dataset
 
@@ -157,17 +157,16 @@ class TextToGraphQLDataset(Dataset):
           data = json.load(f)
 
           for element in data:
-            question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']]) + ' </s>'
-            tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, pad_to_max_length=True, truncation=True, return_tensors='pt')
+            question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']])
+            tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, padding=True, truncation=True, return_tensors='pt')
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.encode_plus(element['query'] + ' </s>',max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
+            tokenized_t = tokenizer.encode_plus(element['query'],max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.target.append(tokenized_t)
             self.schema_ids.append(element['schemaId'])
 
   def get_question_with_schema(self, question, schemaId):
-        return 'translate English to GraphQL: ' + question  + ' ' + ' '.join(self.name_to_schema[schemaId]) + ' </s>'
-
+        return 'translate English to GraphQL: ' + question  + ' ' + ' '.join(self.name_to_schema[schemaId])
 
   def __len__(self):
         'Denotes the total number of samples'
@@ -222,7 +221,7 @@ class MaskGraphQLDataset(Dataset):
           for example in data:
 
             utterance = example['query']
-            encoded_source = tokenizer.encode(utterance + ' </s>', max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
+            encoded_source = tokenizer.encode(utterance, max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
             token_count = encoded_source.shape[0]
             repeated_utterance = [encoded_source for _ in range(token_count)]
             for pos in range(1, token_count):
@@ -231,7 +230,7 @@ class MaskGraphQLDataset(Dataset):
               if target_id == tokenizer.eos_token_id:
                   break
               encoded_source[pos] = tokenizer.mask_token_id
-              decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id])) + ' </s>'
+              decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id]))
               encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, pad_to_max_length=True, truncation=True).squeeze()
               if encoded_target is not None and torch.numel(encoded_target) > 0:
                   self.target.append(encoded_target)
@@ -328,7 +327,7 @@ class SpiderDataset(Dataset):
 
             # group columns with tables. 
 
-            db_with_question = 'translate English to SQL: ' + element['question'] + ' ' + tables_with_columns + '</s>'
+            db_with_question = 'translate English to SQL: ' + element['question'] + ' ' + tables_with_columns
             # question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']]) + ' </s>'
 
             tokenized_s = tokenizer.batch_encode_plus([db_with_question],max_length=1024, pad_to_max_length=True, truncation=True,return_tensors='pt')
@@ -337,7 +336,7 @@ class SpiderDataset(Dataset):
             #might need to collate
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.batch_encode_plus([element['query'] + ' </s>'],max_length=block_size, pad_to_max_length=True, truncation=True,return_tensors='pt')
+            tokenized_t = tokenizer.batch_encode_plus([element['query']],max_length=block_size, pad_to_max_length=True, truncation=True,return_tensors='pt')
             self.target.append(tokenized_t)
 
 
@@ -403,8 +402,8 @@ class CoSQLMaskDataset(Dataset):
                 # self.source.append(encoded_source)
 
                 encoded_source[pos] = tokenizer.mask_token_id
-                decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id])) + ' </s>'
-                encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, pad_to_max_length=True, truncation=True).squeeze() # should always be of size 1
+                decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id]))
+                encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, padding='max_length', truncation=True).squeeze() # should always be of size 1
                 self.target.append(encoded_target)
                 self.source.append(encoded_source)
 
@@ -542,7 +541,7 @@ class T5MultiSPModel(pl.LightningModule):
     # else:
     return {"val_loss": loss}
 
-  def validation_epoch_end(self, outputs):
+  def on_validation_epoch_end(self, outputs):
     avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
     # if self.task == 'finetune':
     #   avg_acc = torch.stack([x["val_acc"] for x in outputs]).mean()
@@ -775,7 +774,7 @@ trainer = Trainer(accelerator='cpu', max_epochs=1, log_every_n_steps=1, limit_tr
 
 # # import gc
 # # gc.collect()
-
+print("lets train this model!")
 trainer.fit(system)
 
 # # Running the next two blocks probably uses memory unless I use without gradient.
