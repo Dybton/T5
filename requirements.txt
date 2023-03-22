@@ -27,7 +27,7 @@ fastjsonschema==2.16.3
 filelock==3.4.1
 fqdn==1.5.1
 frozenlist==1.2.0
-fsspec==2023.3.0
+fsspec==2022.1.0
 gdown==4.6.4
 git-filter-repo==2.38.0
 google-auth==2.16.2
@@ -139,3 +139,7 @@ Werkzeug==2.2.3
 widgetsnbextension==4.0.5
 yarl==1.8.2
 zipp==3.15.0
+
+git add -A
+git commit -m "updating requirements.txt"
+git push
