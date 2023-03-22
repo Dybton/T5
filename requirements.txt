@@ -33,7 +33,7 @@ git-filter-repo==2.38.0
 google-auth==2.16.2
 google-auth-oauthlib==0.4.6
 graphql-core==3.2.3
-grpcio==1.51.3
+grpcio==1.48.2
 huggingface-hub==0.13.3
 idna==3.4
 importlib-metadata==6.1.0
