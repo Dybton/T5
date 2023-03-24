@@ -764,7 +764,7 @@ trainer = pl.Trainer(logger=logger)
 # # )
 # # trainer = Trainer(gpus=1, max_epochs=1, progress_bar_refresh_rate=1)
 # #trainer = Trainer(gpus=1, max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
-trainer = Trainer(accelerator='cpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2)
+trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 # # trainer = Trainer(gpus=1, max_epochs=3, auto_lr_find=True, progress_bar_refresh_rate=1, limit_train_batches=0.2)\
 # # trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
 # # trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2,checkpoint_callback=checkpoint_callback)
