@@ -220,7 +220,7 @@ class MaskGraphQLDataset(Dataset):
         self.source = []
         self.target = []
         path = './SPEGQL-dataset/dataset/' + type_path
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8') as f:
           data = json.load(f)
           for example in data:
 
@@ -383,7 +383,7 @@ class CoSQLMaskDataset(Dataset):
         self.source = []
         self.target = []
         path = './cosql_dataset/sql_state_tracking/' + type_path
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8') as f:
           data = json.load(f)
           for element in data:
             for interaction in element['interaction']:
