@@ -676,18 +676,20 @@ class T5MultiSPModel(pl.LightningModule):
             padded_tensors = [torch.cat([sample[key], torch.zeros(max_length - len(sample[key]), dtype=torch.long)], dim=0) for sample in batch]
             collated_batch[key] = torch.stack(padded_tensors, dim=0)
         else:
-            collated_batch[key] = torch.tensor([sample[key] for sample in batch])
+            collated_batch[key] = torch.stack([sample[key] for sample in batch], dim=0)
 
     return collated_batch
 
-  def train_dataloader(self):
-      return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn)
 
-  def val_dataloader(self):
-      return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn)
+def train_dataloader(self):
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=32)
 
-  def test_dataloader(self):
-      return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn)
+def val_dataloader(self):
+    return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
+
+def test_dataloader(self):
+    return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
+
 
 
 
