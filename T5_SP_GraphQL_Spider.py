@@ -666,7 +666,7 @@ class T5MultiSPModel(pl.LightningModule):
       self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
-  def custom_collate_fn(batch):
+  def custom_collate_fn(self, batch):
     keys = batch[0].keys()
     collated_batch = {}
 
@@ -681,13 +681,14 @@ class T5MultiSPModel(pl.LightningModule):
     return collated_batch
 
   def train_dataloader(self):
-      return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=custom_collate_fn)
+      return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn)
 
   def val_dataloader(self):
-      return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=custom_collate_fn)
+      return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn)
 
   def test_dataloader(self):
-      return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=custom_collate_fn)
+      return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn)
+
 
 
 
