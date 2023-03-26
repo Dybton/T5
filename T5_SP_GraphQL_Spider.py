@@ -666,14 +666,29 @@ class T5MultiSPModel(pl.LightningModule):
       self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
+  def custom_collate_fn(batch):
+    keys = batch[0].keys()
+    collated_batch = {}
+
+    for key in keys:
+        if key in ['source_ids', 'target_ids']:
+            max_length = max([len(sample[key]) for sample in batch])
+            padded_tensors = [torch.cat([sample[key], torch.zeros(max_length - len(sample[key]), dtype=torch.long)], dim=0) for sample in batch]
+            collated_batch[key] = torch.stack(padded_tensors, dim=0)
+        else:
+            collated_batch[key] = torch.tensor([sample[key] for sample in batch])
+
+    return collated_batch
+
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+      return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=custom_collate_fn)
 
   def val_dataloader(self):
-    return DataLoader(self.val_dataset, batch_size=self.batch_size)
+      return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=custom_collate_fn)
 
   def test_dataloader(self):
-    return DataLoader(self.test_dataset, batch_size=self.batch_size)
+      return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=custom_collate_fn)
+
 
 
 
@@ -794,93 +809,28 @@ else:
 # gc.collect()
 
 # Running the next two blocks probably uses memory unless I use without gradient.
-# 
+
 
 system.prepare_data() # might not be needed. 
 
 
-# In[ ]:
-
 system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
-
-
-# In[ ]:
 
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
 
-# logits = system.model(input_ids)[0]
-
-
-# In[ ]:
-
-
-#system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
-
-
-# # Finetune
-
-# In[ ]:
-
-
-# len(system.val_dataloader().dataset)
-
-
-# In[ ]:
-
-
-# system = TextGraphQLModel.load_from_checkpoint('./_ckpt_epoch_0_v0.ckpt' )
-
-
-# In[ ]:
-
 
 system.hyperparams
 
-
-# In[ ]:
-
-
 system.task = 'finetune'
 system.batch_size = 2 # because t5-base is smaller than bart.
-# system.lr=3e-4 # -6 is original
-# system.batch_size = 16
+
 system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
-# system.hyperparams.lr=3e-4
-# TODO collate to go back to 16
-# system.model.config.output_past=True
-# system.model.model.decoder.output_past=True
-# system.add_special_tokens()
-# system.model.output_past = True
-
-
-# shouldn't we monitor: `avg_val_loss`?
-
-# In[ ]:
-
 
 from pytorch_lightning.callbacks import ModelCheckpoint
-# trainer = Trainer(num_tpu_cores=8,max_epochs=1)   
-# trainer = Trainer(max_epochs=1, limit_train_batches=0.1)
-# checkpoint_callback = ModelCheckpoint(
-#     filepath=os.getcwd()+'/checkpoint_finetuning',
-#     verbose=True,
-#     monitor='val_loss',
-#     mode='min',
-#     prefix=''
-# )
 
-# trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
-# trainer = Trainer(gpus=1, progress_bar_refresh_rate=1, val_check_interval=0.4)
 trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
-# trainer = Trainer(gpus=1, max_epochs=3, progress_bar_refresh_rate=1, val_check_interval=0.5)
-# trainer = Trainer(gpus=1,max_epochs=3, progress_bar_refresh_rate=1,checkpoint_callback=checkpoint_callback)
-# trainer = Trainer(num_tpu_cores=8,max_epochs=1, progress_bar_refresh_rate=1)
-
-
-# In[ ]:
-
 
 trainer.fit(system)
 
