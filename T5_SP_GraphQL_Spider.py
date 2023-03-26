@@ -782,6 +782,7 @@ trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_tr
 # # gc.collect()
 print("lets train this model!")
 trainer.fit(system)
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 torch.save(system.state_dict(), 'model_weights.pth')
 
