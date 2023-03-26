@@ -763,9 +763,13 @@ trainer = pl.Trainer(logger=logger)
 # #     mode='min',
 # #     prefix=''
 # # )
+
+if os.path.exists('model_weights.pth'):
+    # Load the model weights if the file exists
+    system.load_state_dict(torch.load('model_weights.pth'))
+
 # # trainer = Trainer(gpus=1, max_epochs=1, progress_bar_refresh_rate=1)
 # #trainer = Trainer(gpus=1, max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
-trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 # # trainer = Trainer(gpus=1, max_epochs=3, auto_lr_find=True, progress_bar_refresh_rate=1, limit_train_batches=0.2)\
 # # trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
 # # trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2,checkpoint_callback=checkpoint_callback)
@@ -778,16 +782,19 @@ trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_tr
 
 # # In[50]:
 
+else:
+    # If the weights file doesn't exist, train the model and save the weights after training
+    trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
+    print("lets train this model!")
+    trainer.fit(system)
+    torch.save(system.state_dict(), 'model_weights.pth')
+
 # # import gc
 # # gc.collect()
-print("lets train this model!")
-trainer.fit(system)
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-
-torch.save(system.state_dict(), 'model_weights.pth')
 
 # # Running the next two blocks probably uses memory unless I use without gradient.
 # # 
+
 
 # # In[ ]:
 
