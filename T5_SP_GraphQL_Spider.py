@@ -764,6 +764,8 @@ trainer = pl.Trainer(logger=logger)
 # #     prefix=''
 # # )
 
+trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
+
 if os.path.exists('model_weights.pth'):
     # Load the model weights if the file exists
     system.load_state_dict(torch.load('model_weights.pth'))
@@ -784,7 +786,6 @@ if os.path.exists('model_weights.pth'):
 
 else:
     # If the weights file doesn't exist, train the model and save the weights after training
-    trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
     print("lets train this model!")
     trainer.fit(system)
     torch.save(system.state_dict(), 'model_weights.pth')
