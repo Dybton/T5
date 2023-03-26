@@ -143,7 +143,8 @@ class TextToGraphQLDataset(Dataset):
         self.max_len = 0
         self.name_to_schema = {}
         for schema_path in schemas:
-           with open(schema_path, 'r') as s:
+           with open(schema_path, 'r', encoding='utf-8') as s:
+            
              data = json.load(s)
 
              type_field_tokens = [ ['<t>'] + [t['name']] + ['{'] + [ f['name'] for f in t['fields']] + ['}'] + ['</t>'] for t in data['types']]
@@ -157,7 +158,7 @@ class TextToGraphQLDataset(Dataset):
 
              self.name_to_schema[schema_name] = schema_tokens
 
-        with open(dataset_path, 'r') as f:
+        with open(dataset_path, 'r', encoding='utf-8') as f:
           data = json.load(f)
 
           for element in data:
@@ -220,7 +221,7 @@ class MaskGraphQLDataset(Dataset):
         self.source = []
         self.target = []
         path = './SPEGQL-dataset/dataset/' + type_path
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
           data = json.load(f)
           for example in data:
 
