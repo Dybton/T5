@@ -796,6 +796,8 @@ else:
 # Running the next two blocks probably uses memory unless I use without gradient.
 # 
 
+system.prepare_data() # might not be needed. 
+
 
 # In[ ]:
 
@@ -849,7 +851,6 @@ system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
 # TODO collate to go back to 16
 # system.model.config.output_past=True
 # system.model.model.decoder.output_past=True
-system.prepare_data() # might not be needed. 
 # system.add_special_tokens()
 # system.model.output_past = True
 
