@@ -789,290 +789,290 @@ else:
     trainer.fit(system)
     torch.save(system.state_dict(), 'model_weights.pth')
 
-# # import gc
-# # gc.collect()
+# import gc
+# gc.collect()
 
-# # Running the next two blocks probably uses memory unless I use without gradient.
-# # 
+# Running the next two blocks probably uses memory unless I use without gradient.
+# 
 
 
-# # In[ ]:
+# In[ ]:
 
-# #system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
+system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
-# # input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
+TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
+input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
 
-# # logits = system.model(input_ids)[0]
+# logits = system.model(input_ids)[0]
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# #system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
+#system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
 
 
-# # # Finetune
+# # Finetune
 
-# # In[ ]:
+# In[ ]:
 
 
-# # len(system.val_dataloader().dataset)
+# len(system.val_dataloader().dataset)
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # system = TextGraphQLModel.load_from_checkpoint('./_ckpt_epoch_0_v0.ckpt' )
+# system = TextGraphQLModel.load_from_checkpoint('./_ckpt_epoch_0_v0.ckpt' )
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# #system.hyperparams
+system.hyperparams
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # system.task = 'finetune'
-# # system.batch_size = 2 # because t5-base is smaller than bart.
-# # # system.lr=3e-4 # -6 is original
-# # # system.batch_size = 16
-# # system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
-# # # system.hyperparams.lr=3e-4
-# # # TODO collate to go back to 16
-# # # system.model.config.output_past=True
-# # # system.model.model.decoder.output_past=True
-# # system.prepare_data() # might not be needed. 
-# # # system.add_special_tokens()
-# # # system.model.output_past = True
+system.task = 'finetune'
+system.batch_size = 2 # because t5-base is smaller than bart.
+# system.lr=3e-4 # -6 is original
+# system.batch_size = 16
+system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
+# system.hyperparams.lr=3e-4
+# TODO collate to go back to 16
+# system.model.config.output_past=True
+# system.model.model.decoder.output_past=True
+system.prepare_data() # might not be needed. 
+# system.add_special_tokens()
+# system.model.output_past = True
 
 
-# # shouldn't we monitor: `avg_val_loss`?
+# shouldn't we monitor: `avg_val_loss`?
 
-# # In[ ]:
+# In[ ]:
 
 
-# # from pytorch_lightning.callbacks import ModelCheckpoint
-# # # trainer = Trainer(num_tpu_cores=8,max_epochs=1)   
-# # # trainer = Trainer(max_epochs=1, limit_train_batches=0.1)
-# # # checkpoint_callback = ModelCheckpoint(
-# # #     filepath=os.getcwd()+'/checkpoint_finetuning',
-# # #     verbose=True,
-# # #     monitor='val_loss',
-# # #     mode='min',
-# # #     prefix=''
-# # # )
+from pytorch_lightning.callbacks import ModelCheckpoint
+# trainer = Trainer(num_tpu_cores=8,max_epochs=1)   
+# trainer = Trainer(max_epochs=1, limit_train_batches=0.1)
+# checkpoint_callback = ModelCheckpoint(
+#     filepath=os.getcwd()+'/checkpoint_finetuning',
+#     verbose=True,
+#     monitor='val_loss',
+#     mode='min',
+#     prefix=''
+# )
 
-# # # trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
-# # # trainer = Trainer(gpus=1, progress_bar_refresh_rate=1, val_check_interval=0.4)
-# # trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
-# # # trainer = Trainer(gpus=1, max_epochs=3, progress_bar_refresh_rate=1, val_check_interval=0.5)
-# # # trainer = Trainer(gpus=1,max_epochs=3, progress_bar_refresh_rate=1,checkpoint_callback=checkpoint_callback)
-# # # trainer = Trainer(num_tpu_cores=8,max_epochs=1, progress_bar_refresh_rate=1)
+# trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
+# trainer = Trainer(gpus=1, progress_bar_refresh_rate=1, val_check_interval=0.4)
+trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
+# trainer = Trainer(gpus=1, max_epochs=3, progress_bar_refresh_rate=1, val_check_interval=0.5)
+# trainer = Trainer(gpus=1,max_epochs=3, progress_bar_refresh_rate=1,checkpoint_callback=checkpoint_callback)
+# trainer = Trainer(num_tpu_cores=8,max_epochs=1, progress_bar_refresh_rate=1)
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # trainer.fit(system)
+trainer.fit(system)
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # inputs = system.val_dataset[0]
-# # system.tokenizer.decode(inputs['source_ids'])
+# inputs = system.val_dataset[0]
+# system.tokenizer.decode(inputs['source_ids'])
 
-# # # system.tokenizer.decode(inputs['target_ids'])
+# # system.tokenizer.decode(inputs['target_ids'])
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # # inputs = system.tokenizer.batch_encode_plus([user_input], max_length=1024, return_tensors='pt')
-# # # generated_ids = system.bart.generate(example['input_ids'].cuda(), attention_mask=example['attention_mask'].cuda(), num_beams=5, max_length=40,repetition_penalty=3.0)
-# # # maybe i didn't need attention_mask? or the padding was breaking something.
-# # # attention mask is only needed  
-# # generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
-# # # summary_text = system.tokenizer.decode(generated_ids[0])
+# # inputs = system.tokenizer.batch_encode_plus([user_input], max_length=1024, return_tensors='pt')
+# # generated_ids = system.bart.generate(example['input_ids'].cuda(), attention_mask=example['attention_mask'].cuda(), num_beams=5, max_length=40,repetition_penalty=3.0)
+# # maybe i didn't need attention_mask? or the padding was breaking something.
+# # attention mask is only needed  
+# generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
+# # summary_text = system.tokenizer.decode(generated_ids[0])
 
-# # hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+# hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # print(hyps)
+# print(hyps)
 
 
-# # improving the network: 
-# # - can it handle <, > ? any other missing could check the dataset directy for unk
-# # - try to increase the learning rate an order of magnitude.
+# improving the network: 
+# - can it handle <, > ? any other missing could check the dataset directy for unk
+# - try to increase the learning rate an order of magnitude.
 
-# # In[ ]:
+# In[ ]:
 
 
-# # trainer.save_checkpoint('finished.ckpt')
+# trainer.save_checkpoint('finished.ckpt')
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # !zip -r finished_train.zip finished.ckpt
+# !zip -r finished_train.zip finished.ckpt
 
 
-# # The cells below is used to load a checkpoint instead of training.
+# The cells below is used to load a checkpoint instead of training.
 
-# # In[ ]:
+# In[ ]:
 
 
-# # from google.colab import drive
-# # drive.mount('/content/gdrive')
+# from google.colab import drive
+# drive.mount('/content/gdrive')
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # from google.colab import drive
-# # drive.flush_and_unmount()
+# from google.colab import drive
+# drive.flush_and_unmount()
 
 
-# # In[ ]:
+# In[ ]:
 
 
 
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # !cp ./drive/My\ Drive/ssh_files/finished_train.zip ./finished_train.zip
+# !cp ./drive/My\ Drive/ssh_files/finished_train.zip ./finished_train.zip
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # !unzip ./finished_train.zip
+# !unzip ./finished_train.zip
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # system = system.load_from_checkpoint('finished.ckpt')
-# # system.task='finetune'
-# # trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-# # trainer.fit(system)
+# system = system.load_from_checkpoint('finished.ckpt')
+# system.task='finetune'
+# trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
+# trainer.fit(system)
 
 
-# # # Test
+# # Test
 
-# # In[ ]:
+# In[ ]:
 
 
-# # system.num_beams = 3
-# # system.test_flag = 'graphql'
-# # system.prepare_data()
-# # trainer.test()
+# system.num_beams = 3
+# system.test_flag = 'graphql'
+# system.prepare_data()
+# trainer.test()
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # system.num_beams = 3
-# # system.test_flag = 'sql'
-# # system.prepare_data()
-# # trainer.test()
+# system.num_beams = 3
+# system.test_flag = 'sql'
+# system.prepare_data()
+# trainer.test()
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # import nltk
-# # nltk.download('punkt')
+# import nltk
+# nltk.download('punkt')
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # !cd spider && git clone https://github.com/taoyds/spider
+# !cd spider && git clone https://github.com/taoyds/spider
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # !cd spider && python ./spider/evaluation.py --gold dev_gold.sql --pred ../test_predictions.txt --etype match --db ./database --table tables.json
+# !cd spider && python ./spider/evaluation.py --gold dev_gold.sql --pred ../test_predictions.txt --etype match --db ./database --table tables.json
 
 
 
-# # # Inference server
+# # Inference server
 
-# # In[ ]:
+# In[ ]:
 
 
-# # !pip install flask-ngrok
+# !pip install flask-ngrok
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # pip install -U flask-cors
+# pip install -U flask-cors
 
 
-# # In[ ]:
+# In[ ]:
 
 
-# # from flask_ngrok import run_with_ngrok
-# # from flask import Flask, jsonify, request, make_response
-# # from flask_cors import CORS
-# # app = Flask(__name__)
-# # CORS(app)
-# # run_with_ngrok(app)   #starts ngrok when the app is run
+# from flask_ngrok import run_with_ngrok
+# from flask import Flask, jsonify, request, make_response
+# from flask_cors import CORS
+# app = Flask(__name__)
+# CORS(app)
+# run_with_ngrok(app)   #starts ngrok when the app is run
 
-# # @app.route('/', methods=['GET', 'POST'])
-# # @app.route("/predict", methods=['GET', 'POST'])
-# # def predict():
-# #   # if request.method == 'POST':
-# #     # req_content = request.get_json()
-# #     # print("request ", req_content)
-# #   req_json = request.get_json()
-# #   print(request)
-# #   print(req_json)
-# #   prompt = req_json['prompt']
-# #   schemaId = req_json['schemaId']
-# #   if system.train_dataset_g.name_to_schema[schemaId] is not None:
-# #     input_string = system.train_dataset_g.get_question_with_schema(prompt, schemaId)
-# #   elif system.dev_dataset.name_to_schema[schemaId] is not None:
-# #     input_string = system.val_dataset_g.get_question_with_schema(prompt, schemaId)
-# #   print(input_string)
+# @app.route('/', methods=['GET', 'POST'])
+# @app.route("/predict", methods=['GET', 'POST'])
+# def predict():
+#   # if request.method == 'POST':
+#     # req_content = request.get_json()
+#     # print("request ", req_content)
+#   req_json = request.get_json()
+#   print(request)
+#   print(req_json)
+#   prompt = req_json['prompt']
+#   schemaId = req_json['schemaId']
+#   if system.train_dataset_g.name_to_schema[schemaId] is not None:
+#     input_string = system.train_dataset_g.get_question_with_schema(prompt, schemaId)
+#   elif system.dev_dataset.name_to_schema[schemaId] is not None:
+#     input_string = system.val_dataset_g.get_question_with_schema(prompt, schemaId)
+#   print(input_string)
   
-# #   # val_inputs = system.val_dataset[0]
-# #   # print(system.tokenizer.decode(val_inputs['source_ids'], skip_special_tokens=False))
+#   # val_inputs = system.val_dataset[0]
+#   # print(system.tokenizer.decode(val_inputs['source_ids'], skip_special_tokens=False))
 
-# #   inputs = system.tokenizer.batch_encode_plus([input_string], max_length=1024, return_tensors='pt')['input_ids']
+#   inputs = system.tokenizer.batch_encode_plus([input_string], max_length=1024, return_tensors='pt')['input_ids']
 
-# #   print(inputs.shape)
-# #   # print(val_inputs['source_ids'].shape)
-
-
-# #   # generated_ids = system.model.generate(val_inputs['source_ids'].unsqueeze(0).cuda(), num_beams=1, repetition_penalty=1.0, max_length=1000, early_stopping=True)
-# #   generated_ids = system.model.generate(inputs.cuda(), num_beams=3, repetition_penalty=1.0, max_length=1000, early_stopping=True)
-# #   hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
-# #   print(hyps)
-# #   dict_res = { "prediction" : hyps[0]}
-# #   print(dict_res)
-# #   return jsonify(dict_res)
+#   print(inputs.shape)
+#   # print(val_inputs['source_ids'].shape)
 
 
-# # app.run()
+#   # generated_ids = system.model.generate(val_inputs['source_ids'].unsqueeze(0).cuda(), num_beams=1, repetition_penalty=1.0, max_length=1000, early_stopping=True)
+#   generated_ids = system.model.generate(inputs.cuda(), num_beams=3, repetition_penalty=1.0, max_length=1000, early_stopping=True)
+#   hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+#   print(hyps)
+#   dict_res = { "prediction" : hyps[0]}
+#   print(dict_res)
+#   return jsonify(dict_res)
 
 
-# # In[ ]:
+# app.run()
+
+
+# In[ ]:
 
 
 
