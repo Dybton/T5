@@ -783,6 +783,8 @@ trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_tr
 print("lets train this model!")
 trainer.fit(system)
 
+torch.save(system.state_dict(), 'model_weights.pth')
+
 # # Running the next two blocks probably uses memory unless I use without gradient.
 # # 
 
