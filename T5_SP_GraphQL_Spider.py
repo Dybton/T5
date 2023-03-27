@@ -678,8 +678,10 @@ class T5MultiSPModel(pl.LightningModule):
             collated_batch[key] = torch.stack(padded_tensors, dim=0)
         else:
             collated_batch[key] = torch.stack([sample[key] for sample in batch], dim=0)
+            print(f"Key: {key}, Data: {[sample[key] for sample in batch]}") # Add this print statement
 
     return collated_batch
+
 
 
 
