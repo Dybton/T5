@@ -683,16 +683,15 @@ class T5MultiSPModel(pl.LightningModule):
     return collated_batch
 
 
-
-
   def train_dataloader(self):
-      return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=lambda batch: self.custom_collate_fn(batch), num_workers=32)
 
   def val_dataloader(self):
-      return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
+      return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=lambda batch: self.custom_collate_fn(batch), num_workers=32)
 
   def test_dataloader(self):
-      return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
+      return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=lambda batch: self.custom_collate_fn(batch), num_workers=32)
+
 
 
 
