@@ -78,6 +78,7 @@ from transformers import AutoTokenizer
 from transformers import AdamW
 from torch.autograd import Variable
 
+
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
 
@@ -666,7 +667,7 @@ class T5MultiSPModel(pl.LightningModule):
       self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
-  def custom_collate_fn(self, batch):
+  def custom_collate_fn(batch):
     keys = batch[0].keys()
     collated_batch = {}
 
@@ -679,6 +680,7 @@ class T5MultiSPModel(pl.LightningModule):
             collated_batch[key] = torch.stack([sample[key] for sample in batch], dim=0)
 
     return collated_batch
+
 
 
   def train_dataloader(self):
