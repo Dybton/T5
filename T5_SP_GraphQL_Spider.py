@@ -830,14 +830,22 @@ system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_sp
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
 
-
-system.hyperparams
-
+# Fine Tuning
 system.task = 'finetune'
 system.batch_size = 2 # because t5-base is smaller than bart.
 
+system.hyperparams
 system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
 
+if os.path.exists('fine_tuned_model_weights.pth'):
+    # Load the model weights if the file exists
+    system.load_state_dict(torch.load('fine_tuned_model_weights.pth'))
+else:
+  print("Let's fine-tune this model!")
+  trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
+  trainer.fit(system)
+  torch.save(system.state_dict(), 'fine_tuned_model_weights.pth')
+  
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
