@@ -682,7 +682,6 @@ class T5MultiSPModel(pl.LightningModule):
             max_length = max([len(sample[key]) for sample in batch])
             padded_tensors = [torch.cat([sample[key], torch.zeros(max_length - len(sample[key]), dtype=torch.long)], dim=0) for sample in batch]
             collated_batch[key] = torch.stack(padded_tensors, dim=0)
-            print(f"Key: {key}, Data: {[sample[key] for sample in batch]}") # Add this print statement
 
     return collated_batch
 
@@ -753,7 +752,8 @@ if tensorflow_active:
 
 
 import argparse
-
+from pytorch_lightning.loggers import TensorBoardLogger
+import pytorch_lightning as pl
 
 # # In[45]:
 
@@ -763,31 +763,14 @@ hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
 
 # # In[46]:
 
-
 # # system = ConvBartSystem(dataset, train_sampler, batch_size=2)
 system = T5MultiSPModel(hyperparams,batch_size=32)
 print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 
-
-# # In[47]:
-
-
-from pytorch_lightning.loggers import TensorBoardLogger
-import pytorch_lightning as pl
 # Initialize the logger
 logger = TensorBoardLogger("lightning_logs/")
 # Pass the logger to the Trainer
 trainer = pl.Trainer(logger=logger)
-
-# # trainer = Trainer(num_tpu_cores=8,max_epochs=1)   
-# # trainer = Trainer(max_epochs=1, limit_train_batches=0.1)
-# # checkpoint_callback = ModelCheckpoint(
-# #     filepath=os.getcwd()+'/checkpoint',
-# #     verbose=True,
-# #     monitor='val_loss',
-# #     mode='min',
-# #     prefix=''
-# # )
 
 trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
@@ -795,49 +778,38 @@ if os.path.exists('model_weights.pth'):
     # Load the model weights if the file exists
     system.load_state_dict(torch.load('model_weights.pth'))
 
-# # trainer = Trainer(gpus=1, max_epochs=1, progress_bar_refresh_rate=1)
-# #trainer = Trainer(gpus=1, max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
-# # trainer = Trainer(gpus=1, max_epochs=3, auto_lr_find=True, progress_bar_refresh_rate=1, limit_train_batches=0.2)\
-# # trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2)
-# # trainer = Trainer(gpus=1,max_epochs=1, progress_bar_refresh_rate=1, limit_train_batches=0.2,checkpoint_callback=checkpoint_callback)
-# # trainer = Trainer(num_tpu_cores=8,max_epochs=1, progress_bar_refresh_rate=1)
-
-# # In[48]:
-
-# # Print the version of PyTorch Lightning
-# print(pl.__version__)
-
-# # In[50]:
-
 else:
     # If the weights file doesn't exist, train the model and save the weights after training
     print("lets train this model!")
     trainer.fit(system)
     torch.save(system.state_dict(), 'model_weights.pth')
 
-# import gc
-# gc.collect()
-
-# Running the next two blocks probably uses memory unless I use without gradient.
-
-
 system.prepare_data() # might not be needed. 
 
-
+### Testing the model
 system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
-
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
 
+# What should this return?
 
-system.hyperparams
-
+# Fine Tuning
 system.task = 'finetune'
 system.batch_size = 2 # because t5-base is smaller than bart.
 
+system.hyperparams
 system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
 
+if os.path.exists('fine_tuned_model_weights.pth'):
+    # Load the model weights if the file exists
+    system.load_state_dict(torch.load('fine_tuned_model_weights.pth'))
+else:
+  print("Let's fine-tune this model!")
+  trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
+  trainer.fit(system)
+  torch.save(system.state_dict(), 'fine_tuned_model_weights.pth')
+  
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
