@@ -696,11 +696,6 @@ class T5MultiSPModel(pl.LightningModule):
 
 
 
-
-
-
-
-
 # # In[42]:
 
 # %load_ext tensorboard 
