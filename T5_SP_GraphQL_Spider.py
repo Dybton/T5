@@ -809,12 +809,11 @@ else:
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 
-
 # In[ ]:
 
 
-# inputs = system.val_dataset[0]
-# system.tokenizer.decode(inputs['source_ids'])
+inputs = system.val_dataset[0]
+system.tokenizer.decode(inputs['source_ids'])
 
 # # system.tokenizer.decode(inputs['target_ids'])
 
@@ -826,16 +825,16 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 # # generated_ids = system.bart.generate(example['input_ids'].cuda(), attention_mask=example['attention_mask'].cuda(), num_beams=5, max_length=40,repetition_penalty=3.0)
 # # maybe i didn't need attention_mask? or the padding was breaking something.
 # # attention mask is only needed  
-# generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
+generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
 # # summary_text = system.tokenizer.decode(generated_ids[0])
 
-# hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
 
 # In[ ]:
 
-
-# print(hyps)
+print("hyps")
+print(hyps)
 
 
 # improving the network: 
@@ -891,11 +890,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 # In[ ]:
 
 
-# system = system.load_from_checkpoint('finished.ckpt')
-# system.task='finetune'
-# trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-# trainer.fit(system)
-
+system = system.load_from_checkpoint('fine_tuned_model_weights.pth') # he refers to checkpoints. What are those?
+system.task='finetune'
+trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
+trainer.fit(system)
 
 # # Test
 
