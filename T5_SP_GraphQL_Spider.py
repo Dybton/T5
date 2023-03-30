@@ -821,10 +821,12 @@ system.tokenizer.decode(inputs['source_ids'])
 # In[ ]:
 
 
+
 # # inputs = system.tokenizer.batch_encode_plus([user_input], max_length=1024, return_tensors='pt')
 # # generated_ids = system.bart.generate(example['input_ids'].cuda(), attention_mask=example['attention_mask'].cuda(), num_beams=5, max_length=40,repetition_penalty=3.0)
 # # maybe i didn't need attention_mask? or the padding was breaking something.
 # # attention mask is only needed  
+system.model = system.model.cuda()
 generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
 # # summary_text = system.tokenizer.decode(generated_ids[0])
 
