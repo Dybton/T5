@@ -808,9 +808,6 @@ else:
   
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
-
-trainer.fit(system)
 
 
 # In[ ]:
