@@ -889,6 +889,7 @@ print(hyps)
 
 # In[ ]:
 
+print("we're down here")
 if os.path.exists('final_training_model_weights.pth'):
     # Load the model weights if the file exists
   print("Model is allready fine-tuned for the final time, loading weights...")
