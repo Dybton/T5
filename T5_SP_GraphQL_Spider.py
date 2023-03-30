@@ -996,30 +996,32 @@ print(hyps)
 # CORS(app)
 # run_with_ngrok(app)   #starts ngrok when the app is run
 
-# @app.route('/', methods=['GET', 'POST'])
-# @app.route("/predict", methods=['GET', 'POST'])
-# def predict():
-#   # if request.method == 'POST':
-#     # req_content = request.get_json()
-#     # print("request ", req_content)
-#   req_json = request.get_json()
-#   print(request)
-#   print(req_json)
-#   prompt = req_json['prompt']
-#   schemaId = req_json['schemaId']
-#   if system.train_dataset_g.name_to_schema[schemaId] is not None:
-#     input_string = system.train_dataset_g.get_question_with_schema(prompt, schemaId)
-#   elif system.dev_dataset.name_to_schema[schemaId] is not None:
-#     input_string = system.val_dataset_g.get_question_with_schema(prompt, schemaId)
-#   print(input_string)
-  
-#   # val_inputs = system.val_dataset[0]
-#   # print(system.tokenizer.decode(val_inputs['source_ids'], skip_special_tokens=False))
+def predict(prompt, schemaId):
 
-#   inputs = system.tokenizer.batch_encode_plus([input_string], max_length=1024, return_tensors='pt')['input_ids']
+    if system.train_dataset_g.name_to_schema[schemaId] is not None:
+        input_string = system.train_dataset_g.get_question_with_schema(prompt, schemaId)
+    elif system.dev_dataset.name_to_schema[schemaId] is not None:
+        input_string = system.val_dataset_g.get_question_with_schema(prompt, schemaId)
+    print(input_string)
 
-#   print(inputs.shape)
-#   # print(val_inputs['source_ids'].shape)
+    inputs = system.tokenizer.batch_encode_plus([input_string], max_length=1024, return_tensors='pt')['input_ids']
+    print(inputs.shape)
+
+    if(use_gpu == True):
+      generated_ids = system.model.generate(inputs.cuda(), num_beams=3, repetition_penalty=1.0, max_length=1000, early_stopping=True)
+    else:
+      generated_ids = system.model.generate(inputs, num_beams=3, repetition_penalty=1.0, max_length=1000, early_stopping=True)
+    hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+    dict_res = {"prediction": hyps[0]}
+    return dict_res
+
+# Hardcode your data
+hardcoded_schemaId = "battle_death"
+hardcoded_prompt = "How many ships ended up being 'Destroyed'?"
+
+system.prepare_data()
+
+result = predict(hardcoded_prompt, hardcoded_schemaId)
 
 
 #   # generated_ids = system.model.generate(val_inputs['source_ids'].unsqueeze(0).cuda(), num_beams=1, repetition_penalty=1.0, max_length=1000, early_stopping=True)
