@@ -889,11 +889,23 @@ print(hyps)
 
 # In[ ]:
 
+if os.path.exists('final_training_model_weights.pth'):
+    # Load the model weights if the file exists
+  print("Model is allready fine-tuned for the final time, loading weights...")
+  system.load_state_dict(torch.load('final_training_model_weights.pth'))
+  print("final_training_model_weights.pthloaded")
 
-system = system.load_from_checkpoint('fine_tuned_model_weights.pth') # he refers to checkpoints. What are those?
-system.task='finetune'
-trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-trainer.fit(system)
+else:
+  print("Let's fine-tune this model for the last time!")
+  system = system.load_from_checkpoint('fine_tuned_model_weights.pth') # he refers to checkpoints. What are those?
+  trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
+  system.task='finetune'
+  trainer.fit(system)
+  torch.save(system.state_dict(), 'final_training_model_weights.pth')
+
+
+
+
 
 # # Test
 
