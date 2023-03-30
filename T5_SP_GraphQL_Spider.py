@@ -696,11 +696,6 @@ class T5MultiSPModel(pl.LightningModule):
 
 
 
-
-
-
-
-
 # # In[42]:
 
 # %load_ext tensorboard 
@@ -791,8 +786,6 @@ system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_sp
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
-
-# What should this return?
 
 # Fine Tuning
 system.task = 'finetune'
