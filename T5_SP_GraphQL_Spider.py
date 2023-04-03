@@ -944,16 +944,14 @@ if(final_finetuning == True):
 
 
 
-print("use gpu: ", use_gpu)
-
 # In[ ]:
 
-if __name__ == '__main__':
-    # Your main code goes here, e.g.:
-    system.test_flag = 'sql'
-    system.prepare_data()
-    trainer = Trainer(max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-    trainer.test(system, verbose=True)
+# if __name__ == '__main__':
+#     # Your main code goes here, e.g.:
+#     system.test_flag = 'sql'
+#     system.prepare_data()
+#     trainer = Trainer(max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
+#     trainer.test(system, verbose=True)
 
 
 # In[ ]:
@@ -1032,12 +1030,11 @@ def predict(prompt, schemaId):
 
 # Hardcode your data
 hardcoded_schemaId = "battle_death"
-hardcoded_prompt = "How many ships ended up being 'Captured'?"
-
-system.prepare_data()
+hardcoded_prompt = "How many ships ended up being 'Destroyed'?"
 
 result = predict(hardcoded_prompt, hardcoded_schemaId)
-
+print("this is the result")
+print(result)
 
 
 
