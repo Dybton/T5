@@ -57,11 +57,8 @@ print("my version of transformers is " + transformers.__version__)
 
 
 # In[31]:
-
-
 import numpy as np
 import pandas as pd
-
 # # # from tqdm import tqdm
 import torch
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler, ConcatDataset
@@ -106,6 +103,8 @@ from functools import reduce
 # logging.basicConfig(level=logging.INFO)
 
 
+
+
 # In[32]:
 
 
@@ -124,9 +123,9 @@ tensorflow_active = False
 use_gpu = True
 
 hostname = socket.gethostname()
-print(hostname)
+print("hostname " + hostname)
 
-if hostname == "Jakobs-MacBook-Pro.local":
+if hostname == "Jakobs-MBP":
     use_gpu = False
     print("we are one a mac so we're using a cpu")
 else:
@@ -779,10 +778,7 @@ logger = TensorBoardLogger("lightning_logs/")
 # Pass the logger to the Trainer
 trainer = pl.Trainer(logger=logger)
 
-if (use_gpu):
-  trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
-else:
-  trainer = Trainer(max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2)
+
 
 if os.path.exists('model_weights.pth'):
     # Load the model weights if the file exists
@@ -791,6 +787,10 @@ if os.path.exists('model_weights.pth'):
 else:
     # If the weights file doesn't exist, train the model and save the weights after training
     print("lets train this model!")
+    if (use_gpu):
+      trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
+    else:
+      trainer = Trainer(max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2)
     trainer.fit(system)
     torch.save(system.state_dict(), 'model_weights.pth')
 
@@ -942,16 +942,23 @@ if(final_finetuning == True):
 
 # # Test
 
+
+
+print("use gpu: ", use_gpu)
+
+# In[ ]:
+
+if __name__ == '__main__':
+    # Your main code goes here, e.g.:
+    system.test_flag = 'sql'
+    system.prepare_data()
+    trainer = Trainer(max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
+    trainer.test(system, verbose=True)
+
+
 # In[ ]:
 
 
-# system.num_beams = 3
-# system.test_flag = 'graphql'
-# system.prepare_data()
-# trainer.test()
-
-
-# In[ ]:
 
 
 # system.num_beams = 3
@@ -1025,23 +1032,20 @@ def predict(prompt, schemaId):
 
 # Hardcode your data
 hardcoded_schemaId = "battle_death"
-hardcoded_prompt = "How many ships ended up being 'Destroyed'?"
+hardcoded_prompt = "How many ships ended up being 'Captured'?"
 
 system.prepare_data()
 
 result = predict(hardcoded_prompt, hardcoded_schemaId)
 
 
-#   # generated_ids = system.model.generate(val_inputs['source_ids'].unsqueeze(0).cuda(), num_beams=1, repetition_penalty=1.0, max_length=1000, early_stopping=True)
-#   generated_ids = system.model.generate(inputs.cuda(), num_beams=3, repetition_penalty=1.0, max_length=1000, early_stopping=True)
-#   hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
-#   print(hyps)
-#   dict_res = { "prediction" : hyps[0]}
-#   print(dict_res)
-#   return jsonify(dict_res)
 
 
-# app.run()
+## Evaluation
+
+
+
+
 
 
 # In[ ]:
