@@ -1031,7 +1031,6 @@ def predict(prompt, schemaId):
 # Hardcode your data
 hardcoded_schemaId = "battle_death"
 hardcoded_prompt = "How many ships ended up being 'Destroyed'?"
-
 result = predict(hardcoded_prompt, hardcoded_schemaId)
 print("this is the result")
 print(result)
