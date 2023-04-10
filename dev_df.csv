@@ -1,0 +1,555 @@
+query,schemaId,question,question_length_bucket,nesting_level,num_args,schema length,schema complexity
+"query { ship_aggregate ( where : { disposition_of_ship : { _eq : ""Captured"" } } ) { aggregate { count } } }",battle_death,How many ships ended up being 'Captured'?,Short,3,3,9770.0,2339.0
+query { ship ( order_by : { name : desc } ) { name tonnage } },battle_death,List the name and tonnage ordered by in descending alphaetical order for the names.,Very Long,2,2,9770.0,2339.0
+query { battle { name date } },battle_death,"List the name, date and result of each battle.",Short,2,0,9770.0,2339.0
+query { death_aggregate { aggregate { max { killed } min { killed } } } },battle_death,What is maximum and minimum death toll caused each time?,Medium,4,0,9770.0,2339.0
+query { death_aggregate { aggregate { avg { injured } } } },battle_death,What is the average number of injuries caused each time?,Medium,4,0,9770.0,2339.0
+"query { death ( where : { ship : { tonnage : { _eq : ""t"" } } } ) { killed injured } }",battle_death,What are the death and injury situations caused by the ship with tonnage 't'?,Long,4,4,9770.0,2339.0
+"query { battle ( where : { bulgarian_commander : { _neq : ""Boril"" } } ) { name result } }",battle_death,What are the name and results of the battles when the bulgarian commander is not 'Boril',Very Long,3,3,9770.0,2339.0
+"query { battle ( where : { _and : { bulgarian_commander : { _eq : ""Kaloyan"" } , latin_commander : { _eq : ""Baldwin I"" } } } ) { name } }",battle_death,What are the distinct battle names which are between bulgarian commander 'Kaloyan' and latin commander 'Baldwin I'?,Very Long,4,4,9770.0,2339.0
+query { battle_aggregate { aggregate { count } } },battle_death,How many different results are there for the battles?,Medium,3,0,9770.0,2339.0
+"query { death ( where : { note : { _like : ""%East%"" } } ) { note } }",battle_death,What are the notes of the death events which has substring 'East'?,Long,3,3,9770.0,2339.0
+query { continents_aggregate { aggregate { count } } },car_1,How many continents are there?,Short,3,0,17464.0,4335.0
+query { continents_aggregate { aggregate { count } } },car_1,What is the number of continents?,Short,3,0,17464.0,4335.0
+query { countries_aggregate { aggregate { count } } },car_1,How many countries are listed?,Short,3,0,17464.0,4335.0
+query { countries_aggregate { aggregate { count } } },car_1,How many countries exist?,Short,3,0,17464.0,4335.0
+"query { car_names ( limit : 1 , order_by : { cars_data : { horsepower : asc } } ) { model } }",car_1,Which model of the car has the minimum horsepower?,Medium,3,3,17464.0,4335.0
+"query { car_names ( limit : 1 , order_by : { cars_data : { horsepower : asc } } ) { model } }",car_1,What is the model of the car with the smallest amount of horsepower?,Long,3,3,17464.0,4335.0
+"query { cars_data ( where : { car_name : { make : { _eq : ""amc hornet sportabout (sw)"" } } } ) { accelerate } }",car_1,What is the accelerate of the car make amc hornet sportabout (sw)?,Long,4,4,17464.0,4335.0
+"query { cars_data ( where : { car_name : { make : { _eq : ""amc hornet sportabout (sw)"" } } } ) { accelerate } }",car_1,How much does the car accelerate that makes amc hornet sportabout (sw)?,Long,4,4,17464.0,4335.0
+"query { car_makers_aggregate ( where : { countryByCountry : { countryname : { _eq : ""france"" } } } ) { aggregate { count } } }",car_1,How many car makers are there in france?,Short,4,4,17464.0,4335.0
+"query { car_makers_aggregate ( where : { countryByCountry : { countryname : { _eq : ""france"" } } } ) { aggregate { count } } }",car_1,What is the number of makers of care in France?,Short,4,4,17464.0,4335.0
+query { cars_data_aggregate ( where : { cylinders : { _eq : 4 } } ) { aggregate { avg { mpg } } } },car_1,What is the average miles per gallon(mpg) of the cars with 4 cylinders?,Long,4,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { cylinders : { _eq : 4 } } ) { aggregate { avg { mpg } } } },car_1,What is the average miles per gallon of all the cards with 4 cylinders?,Long,4,3,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { weight : asc } , where : { _and : { cylinders : { _eq : 4 } , year : { _eq : 1974 } } } ) { weight } }",car_1,What is the smallest weight of the car produced with 8 cylinders on 1974?,Long,4,5,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { weight : asc } , where : { _and : { cylinders : { _eq : 4 } , year : { _eq : 1974 } } } ) { weight } }",car_1,What is the minimu weight of the car with 8 cylinders produced in 1974?,Long,4,5,17464.0,4335.0
+query { model_list { maker model } },car_1,What are all the makers and models?,Short,2,0,17464.0,4335.0
+query { model_list { maker model } },car_1,What are the makers and models?,Short,2,0,17464.0,4335.0
+query { cars_data_aggregate ( where : { horsepower : { _gt : 150 } } ) { aggregate { count } } },car_1,What is the number of the cars with horsepower more than 150?,Medium,3,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { horsepower : { _gt : 150 } } ) { aggregate { count } } },car_1,What is the number of cars with a horsepower greater than 150?,Long,3,3,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { horsepower : desc } , where : { cylinders : { _eq : 3 } } ) { horsepower car_name { make } } }",car_1,What is the maximum horsepower and the make of the car models with 3 cylinders?,Very Long,3,4,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { horsepower : desc } , where : { cylinders : { _eq : 3 } } ) { horsepower car_name { make } } }",car_1,What is the largest amount of horsepower for the models with 3 cylinders and what make is it?,Very Long,3,4,17464.0,4335.0
+"query { car_names ( limit : 1 , order_by : { cars_data : { mpg : desc } } ) { model } }",car_1,"Which model saves the most gasoline? That is to say, have the maximum miles per gallon.",Very Long,3,3,17464.0,4335.0
+"query { car_names ( limit : 1 , order_by : { cars_data : { mpg : desc } } ) { model } }",car_1,What is the car wmodel with the highest mpg?,Short,3,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { year : { _lt : 1980 } } ) { aggregate { avg { horsepower } } } },car_1,What is the average horsepower of the cars before 1980?,Medium,4,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { year : { _lt : 1980 } } ) { aggregate { avg { horsepower } } } },car_1,What is the average horsepower for all cards produced before 1980?,Long,4,3,17464.0,4335.0
+"query { cars_data_aggregate ( where : { car_name : { model : { _eq : ""volvo"" } } } ) { aggregate { avg { edispl } } } }",car_1,What is the average edispl of the cars of model volvo?,Medium,4,4,17464.0,4335.0
+"query { cars_data_aggregate ( where : { car_name : { model : { _eq : ""volvo"" } } } ) { aggregate { avg { edispl } } } }",car_1,What is the average edispl for all volvos?,Short,4,4,17464.0,4335.0
+query { cars_data_aggregate ( where : { cylinders : { _gt : 4 } } ) { aggregate { count } } },car_1,How many cars have more than 4 cylinders?,Short,3,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { cylinders : { _gt : 4 } } ) { aggregate { count } } },car_1,What is the number of cars with more than 4 cylinders?,Medium,3,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { year : { _eq : 1980 } } ) { aggregate { count } } },car_1,how many cars were produced in 1980?,Short,3,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { year : { _eq : 1980 } } ) { aggregate { count } } },car_1,"In 1980, how many cars were made?",Short,3,3,17464.0,4335.0
+"query { car_makers_aggregate ( where : { fullname : { _eq : ""American Motor Company"" } } ) { aggregate { count } } }",car_1,How many car models were produced by the maker with full name American Motor Company?,Very Long,3,3,17464.0,4335.0
+"query { car_makers_aggregate ( where : { fullname : { _eq : ""American Motor Company"" } } ) { aggregate { count } } }",car_1,What is the number of car models created by the car maker American Motor Company?,Very Long,3,3,17464.0,4335.0
+"query { cars_data ( where : { _and : { weight : { _gt : 3000 , _lt : 4000 } } } , distinct_on : year ) { year } }",car_1,In which years cars were produced weighing no less than 3000 and no more than 4000?,Very Long,4,4,17464.0,4335.0
+"query { cars_data ( where : { _and : { weight : { _gt : 3000 , _lt : 4000 } } } , distinct_on : year ) { year } }",car_1,What are the different years in which there were cars produced that weighed less than 4000 and also cars that weighted more than 3000?,Very Long,4,4,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { accelerate : desc } ) { horsepower } }",car_1,What is the horsepower of the car with the largest accelerate?,Long,2,2,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { accelerate : desc } ) { horsepower } }",car_1,What is the horsepower of the car with the greatest accelerate?,Long,2,2,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { accelerate : asc } , where : { car_name : { model : { _eq : ""volvo"" } } } ) { cylinders } }",car_1,"For model volvo, how many cylinders does the car with the least accelerate have?",Very Long,4,5,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { accelerate : asc } , where : { car_name : { model : { _eq : ""volvo"" } } } ) { cylinders } }",car_1,"For a volvo model, how many cylinders does the version with least accelerate have?",Very Long,4,5,17464.0,4335.0
+query { cars_data_aggregate ( where : { cylinders : { _gt : 6 } } ) { aggregate { count } } },car_1,How many cars has over 6 cylinders?,Short,3,3,17464.0,4335.0
+query { cars_data_aggregate ( where : { cylinders : { _gt : 6 } } ) { aggregate { count } } },car_1,What is the number of carsw ith over 6 cylinders?,Medium,3,3,17464.0,4335.0
+"query { car_names ( limit : 1 , order_by : { cars_data : { horsepower : desc } } , where : { cars_data : { cylinders : { _eq : 4 } } } ) { model } }",car_1,"For the cars with 4 cylinders, which model has the largest horsepower?",Long,4,5,17464.0,4335.0
+"query { car_names ( limit : 1 , order_by : { cars_data : { horsepower : desc } } , where : { cars_data : { cylinders : { _eq : 4 } } } ) { model } }",car_1,"For all of the 4 cylinder cars, which model has the most horsepower?",Long,4,5,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { mpg : desc } , where : { _or : [ { cylinders : { _eq : 8 } } , { year : { _lt : 1980 } } ] } ) { mpg } }",car_1,What is the maximum miles per gallon of the car with 8 cylinders or produced before 1980?,Very Long,4,7,17464.0,4335.0
+"query { cars_data ( limit : 1 , order_by : { mpg : desc } , where : { _or : [ { cylinders : { _eq : 8 } } , { year : { _lt : 1980 } } ] } ) { mpg } }",car_1,What is the maximum mpg of the cars that had 8 cylinders or that were produced before 1980?,Very Long,4,7,17464.0,4335.0
+query { singer_aggregate { aggregate { count } } },concert_singer,How many singers do we have?,Short,3,0,12079.0,2852.0
+query { singer_aggregate { aggregate { count } } },concert_singer,What is the total number of singers?,Short,3,0,12079.0,2852.0
+query { singer ( order_by : { age : desc } ) { name country age } },concert_singer,"Show name, country, age for all singers ordered by age from the oldest to the youngest.",Very Long,2,2,12079.0,2852.0
+query { singer ( order_by : { age : desc } ) { name country age } },concert_singer,"What are the names, countries, and ages for every singer in descending order of age?",Very Long,2,2,12079.0,2852.0
+"query { singer_aggregate ( where : { country : { _eq : ""France"" } } ) { aggregate { avg { age } min { age } max { age } } } }",concert_singer,"What is the average, minimum, and maximum age of all singers from France?",Long,4,3,12079.0,2852.0
+"query { singer_aggregate ( where : { country : { _eq : ""France"" } } ) { aggregate { avg { age } min { age } max { age } } } }",concert_singer,"What is the average, minimum, and maximum age for all French singers?",Long,4,3,12079.0,2852.0
+"query { singer ( limit : 1 , order_by : { age : asc } ) { song_name song_release_year } }",concert_singer,Show the name and the release year of the song by the youngest singer.,Long,2,2,12079.0,2852.0
+"query { singer ( limit : 1 , order_by : { age : asc } ) { song_name song_release_year } }",concert_singer,What are the names and release years for all the songs of the youngest singer?,Very Long,2,2,12079.0,2852.0
+"query { singer ( where : { age : { _gt : 20 } } , distinct_on : country ) { country } }",concert_singer,What are all distinct countries where singers above age 20 are from?,Long,3,3,12079.0,2852.0
+"query { singer ( where : { age : { _gt : 20 } } , distinct_on : country ) { country } }",concert_singer,What are  the different countries with singers above age 20?,Medium,3,3,12079.0,2852.0
+"query { stadium ( where : { capacity : { _gte : 5000 , _lte : 10000 } } ) { location name } }",concert_singer,Show location and name for all stadiums with a capacity between 5000 and 10000.,Very Long,3,3,12079.0,2852.0
+"query { stadium ( where : { capacity : { _gte : 5000 , _lte : 10000 } } ) { location name } }",concert_singer,What are the locations and names of all stations with capacity between 5000 and 10000?,Very Long,3,3,12079.0,2852.0
+query { stadium_aggregate { aggregate { avg { capacity } max { capacity } } } },concert_singer,What is the average and the maximum capacity of all stadiums?,Medium,4,0,12079.0,2852.0
+query { stadium_aggregate { aggregate { avg { capacity } max { capacity } } } },concert_singer,What is the average and maximum capacities for all stations?,Medium,4,0,12079.0,2852.0
+"query { stadium ( limit : 1 , order_by : { average : desc } ) { name capacity } }",concert_singer,What is the name and capacity for the stadium with highest average attendance?,Very Long,2,2,12079.0,2852.0
+"query { stadium ( limit : 1 , order_by : { average : desc } ) { name capacity } }",concert_singer,What is the name and capacity for the stadium with the highest average attendance?,Very Long,2,2,12079.0,2852.0
+"query { concert_aggregate ( where : { _or : [ { year : { _eq : ""2014"" } } , { year : { _eq : ""2015"" } } ] } ) { aggregate { count } } }",concert_singer,How many concerts are there in year 2014 or 2015?,Medium,4,4,12079.0,2852.0
+"query { concert_aggregate ( where : { _or : [ { year : { _eq : ""2014"" } } , { year : { _eq : ""2015"" } } ] } ) { aggregate { count } } }",concert_singer,How many concerts occurred in 2014 or 2015?,Short,4,4,12079.0,2852.0
+"query { singer ( where : { song_name : { _like : ""%Hey%"" } } ) { name country } }",concert_singer,what is the name and nation of the singer who have a song having 'Hey' in its name?,Very Long,3,3,12079.0,2852.0
+"query { singer ( where : { song_name : { _like : ""%Hey%"" } } ) { name country } }",concert_singer,What is the name and country of origin of every singer who has a song with the word 'Hey' in its title?,Very Long,3,3,12079.0,2852.0
+"query { concert_aggregate ( limit : 1 , order_by : { stadium : { capacity : desc } } ) { aggregate { count } } }",concert_singer,Find the number of concerts happened in the stadium with the highest capacity.,Very Long,3,3,12079.0,2852.0
+"query { concert_aggregate ( limit : 1 , order_by : { stadium : { capacity : desc } } ) { aggregate { count } } }",concert_singer,What are the number of concerts that occurred in the stadium with the largest capacity?,Very Long,3,3,12079.0,2852.0
+query { teacher_aggregate { aggregate { count } } },course_teach,How many teachers are there?,Short,3,0,8063.0,1925.0
+query { teacher_aggregate { aggregate { count } } },course_teach,What is the total count of teachers?,Short,3,0,8063.0,1925.0
+query { teacher ( order_by : { age : asc } ) { name } },course_teach,List the names of teachers in ascending order of age.,Medium,2,2,8063.0,1925.0
+query { teacher ( order_by : { age : asc } ) { name } },course_teach,What are the names of the teachers ordered by ascending age?,Medium,2,2,8063.0,1925.0
+query { teacher { age hometown } },course_teach,What are the age and hometown of teachers?,Short,2,0,8063.0,1925.0
+query { teacher { age hometown } },course_teach,What is the age and hometown of every teacher?,Short,2,0,8063.0,1925.0
+"query { teacher ( where : { hometown : { _neq : ""Little Lever Urban Distric"" } } ) { name } }",course_teach,"List the name of teachers whose hometown is not ""Little Lever Urban District"".",Very Long,3,3,8063.0,1925.0
+"query { teacher ( where : { hometown : { _neq : ""Little Lever Urban Distric"" } } ) { name } }",course_teach,"What are the names of the teachers whose hometown is not ""Little Lever Urban District""?",Very Long,3,3,8063.0,1925.0
+"query { teacher ( where : { _or : [ { age : { _eq : ""32"" } } , { age : { _eq : ""33"" } } ] } ) { name } }",course_teach,Show the name of teachers aged either 32 or 33?,Short,4,4,8063.0,1925.0
+"query { teacher ( where : { _or : [ { age : { _eq : ""32"" } } , { age : { _eq : ""33"" } } ] } ) { name } }",course_teach,What are the names of the teachers who are aged either 32 or 33?,Long,4,4,8063.0,1925.0
+"query { teacher ( limit : 1 , order_by : { age : asc } ) { hometown } }",course_teach,What is the hometown of the youngest teacher?,Short,2,2,8063.0,1925.0
+"query { teacher ( limit : 1 , order_by : { age : asc } ) { hometown } }",course_teach,Where is the youngest teacher from?,Short,2,2,8063.0,1925.0
+query { teacher { name course_arranges { course { course } } } },course_teach,Show names of teachers and the courses they are arranged to teach.,Long,4,0,8063.0,1925.0
+query { teacher { name course_arranges { course { course } } } },course_teach,What is the name of each teacher and what course they teach?,Medium,4,0,8063.0,1925.0
+query { teacher ( order_by : { name : asc } ) { name course_arranges { course { course } } } },course_teach,Show names of teachers and the courses they are arranged to teach in ascending alphabetical order of the teacher's name.,Very Long,4,2,8063.0,1925.0
+query { teacher ( order_by : { name : asc } ) { name course_arranges { course { course } } } },course_teach,What are the names of the teachers and the courses they teach in ascending alphabetical order by the name of the teacher?,Very Long,4,2,8063.0,1925.0
+"query { teacher ( where : { course_arranges : { course : { course : { _eq : ""Math"" } } } } ) { name } }",course_teach,Show the name of the teacher for the math course.,Medium,5,4,8063.0,1925.0
+"query { teacher ( where : { course_arranges : { course : { course : { _eq : ""Math"" } } } } ) { name } }",course_teach,What are the names of the people who teach math courses?,Medium,5,4,8063.0,1925.0
+query { documents_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,How many documents do we have?,Short,3,0,10879.0,2631.0
+query { documents_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,Count the number of documents.,Short,3,0,10879.0,2631.0
+query { documents { document_id document_name document_description } },cre_Doc_Template_Mgt,"List document IDs, document names, and document descriptions for all documents.",Very Long,2,0,10879.0,2631.0
+query { documents { document_id document_name document_description } },cre_Doc_Template_Mgt,"What are the ids, names, and descriptions for all documents?",Medium,2,0,10879.0,2631.0
+"query { documents ( where : { document_description : { _like : ""%w%"" } } ) { document_name template_id } }",cre_Doc_Template_Mgt,What is the document name and template id for document with description with the letter 'w' in it?,Very Long,3,3,10879.0,2631.0
+"query { documents ( where : { document_description : { _like : ""%w%"" } } ) { document_name template_id } }",cre_Doc_Template_Mgt,Return the names and template ids for documents that contain the letter w in their description.,Very Long,3,3,10879.0,2631.0
+"query { documents ( where : { document_name : { _eq : ""Robbin CV"" } } ) { document_id template_id document_description } }",cre_Doc_Template_Mgt,"What is the document id, template id and description for document named ""Robbin CV""?",Very Long,3,3,10879.0,2631.0
+"query { documents ( where : { document_name : { _eq : ""Robbin CV"" } } ) { document_id template_id document_description } }",cre_Doc_Template_Mgt,"Return the document id, template id, and description for the document with the name Robbin CV.",Very Long,3,3,10879.0,2631.0
+query { documents_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,How many different templates do all document use?,Medium,3,0,10879.0,2631.0
+query { documents_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,Count the number of different templates used for documents.,Medium,3,0,10879.0,2631.0
+"query { documents_aggregate ( where : { template : { template_type_code : { _eq : ""PPT"" } } } ) { aggregate { count } } }",cre_Doc_Template_Mgt,How many documents are using the template with type code 'PPT'?,Long,4,4,10879.0,2631.0
+"query { documents_aggregate ( where : { template : { template_type_code : { _eq : ""PPT"" } } } ) { aggregate { count } } }",cre_Doc_Template_Mgt,Count the number of documents that use the PPT template type.,Medium,4,4,10879.0,2631.0
+query { templates_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,How many templates do we have?,Short,3,0,10879.0,2631.0
+query { templates_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,Count the number of templates.,Short,3,0,10879.0,2631.0
+query { templates { template_id version_number template_type_code } },cre_Doc_Template_Mgt,"Show template ids, version numbers, and template type codes for all templates.",Very Long,2,0,10879.0,2631.0
+query { templates { template_id version_number template_type_code } },cre_Doc_Template_Mgt,"What are the ids, version numbers, and type codes for each template?",Long,2,0,10879.0,2631.0
+query { templates ( distinct_on : template_type_code ) { template_type_code } },cre_Doc_Template_Mgt,Show all distinct template type codes for all templates.,Medium,2,1,10879.0,2631.0
+query { templates ( distinct_on : template_type_code ) { template_type_code } },cre_Doc_Template_Mgt,What are the different template type codes?,Short,2,1,10879.0,2631.0
+"query { templates ( where : { _or : [ { template_type_code : { _eq : ""PP"" } } , { template_type_code : { _eq : ""PPT"" } } ] } ) { template_id } }",cre_Doc_Template_Mgt,What are the ids of templates with template type code PP or PPT?,Long,4,4,10879.0,2631.0
+"query { templates ( where : { _or : [ { template_type_code : { _eq : ""PP"" } } , { template_type_code : { _eq : ""PPT"" } } ] } ) { template_id } }",cre_Doc_Template_Mgt,Return the ids of templates that have the code PP or PPT.,Medium,4,4,10879.0,2631.0
+"query { templates_aggregate ( where : { template_type_code : { _eq : ""CV"" } } ) { aggregate { count } } }",cre_Doc_Template_Mgt,How many templates have template type code CV?,Short,3,3,10879.0,2631.0
+"query { templates_aggregate ( where : { template_type_code : { _eq : ""CV"" } } ) { aggregate { count } } }",cre_Doc_Template_Mgt,Count the number of templates of the type CV.,Short,3,3,10879.0,2631.0
+query { templates ( where : { version_number : { _gt : 5 } } ) { version_number template_type_code } },cre_Doc_Template_Mgt,What is the version number and template type code for the template with version number later than 5?,Very Long,3,3,10879.0,2631.0
+query { templates ( where : { version_number : { _gt : 5 } } ) { version_number template_type_code } },cre_Doc_Template_Mgt,Return the version numbers and template type codes of templates with a version number greater than 5.,Very Long,3,3,10879.0,2631.0
+query { templates_aggregate { nodes { template_type_code } aggregate { min { version_number } } } },cre_Doc_Template_Mgt,What the smallest version number and its template type code?,Medium,4,0,10879.0,2631.0
+query { templates_aggregate { nodes { template_type_code } aggregate { min { version_number } } } },cre_Doc_Template_Mgt,"Return the lowest version number, along with its corresponding template type code.",Very Long,4,0,10879.0,2631.0
+"query { templates ( where : { documents : { document_name : { _eq : ""Data base"" } } } ) { template_type_code } }",cre_Doc_Template_Mgt,"What is the template type code of the template used by document with the name ""Data base""?",Very Long,4,4,10879.0,2631.0
+"query { templates ( where : { documents : { document_name : { _eq : ""Data base"" } } } ) { template_type_code } }",cre_Doc_Template_Mgt,Return the template type code of the template that is used by a document named Data base.,Very Long,4,4,10879.0,2631.0
+"query { documents ( where : { template : { template_type_code : { _eq : ""BK"" } } } ) { document_name } }",cre_Doc_Template_Mgt,Show all document names using templates with template type code BK.,Long,4,4,10879.0,2631.0
+"query { documents ( where : { template : { template_type_code : { _eq : ""BK"" } } } ) { document_name } }",cre_Doc_Template_Mgt,What are the names of documents that use templates with the code BK?,Long,4,4,10879.0,2631.0
+query { ref_template_types { template_type_code template_type_description } },cre_Doc_Template_Mgt,Show all template type codes and descriptions.,Short,2,0,10879.0,2631.0
+query { ref_template_types { template_type_code template_type_description } },cre_Doc_Template_Mgt,What are the type codes and descriptions for all template types?,Long,2,0,10879.0,2631.0
+"query { ref_template_types ( where : { template_type_code : { _eq : ""AD"" } } ) { template_type_description } }",cre_Doc_Template_Mgt,"What is the template type descriptions for template type code ""AD"".",Long,3,3,10879.0,2631.0
+"query { ref_template_types ( where : { template_type_code : { _eq : ""AD"" } } ) { template_type_description } }",cre_Doc_Template_Mgt,Return the template type description of the template type with the code AD.,Long,3,3,10879.0,2631.0
+"query { ref_template_types ( where : { template_type_description : { _eq : ""Book"" } } ) { template_type_code } }",cre_Doc_Template_Mgt,"What is the template type code for template type description ""Book"".",Long,3,3,10879.0,2631.0
+"query { ref_template_types ( where : { template_type_description : { _eq : ""Book"" } } ) { template_type_code } }",cre_Doc_Template_Mgt,"Return the type code of the template type with the description ""Book"".",Long,3,3,10879.0,2631.0
+query { ref_template_types ( distinct_on : template_type_description ) { template_type_description } },cre_Doc_Template_Mgt,What are the distinct template type descriptions for the templates ever used by any document?,Very Long,2,1,10879.0,2631.0
+query { ref_template_types ( distinct_on : template_type_description ) { template_type_description } },cre_Doc_Template_Mgt,Return the different descriptions for templates that have been used in a document.,Very Long,2,1,10879.0,2631.0
+"query { templates ( where : { ref_template_type : { template_type_description : { _eq : ""Presentation"" } } } ) { template_id } }",cre_Doc_Template_Mgt,"What are the template ids with template type description ""Presentation"".",Long,4,4,10879.0,2631.0
+"query { templates ( where : { ref_template_type : { template_type_description : { _eq : ""Presentation"" } } } ) { template_id } }",cre_Doc_Template_Mgt,Return the ids corresponding to templates with the description 'Presentation'.,Very Long,4,4,10879.0,2631.0
+query { paragraphs_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,How many paragraphs in total?,Short,3,0,10879.0,2631.0
+query { paragraphs_aggregate { aggregate { count } } },cre_Doc_Template_Mgt,Count the number of paragraphs.,Short,3,0,10879.0,2631.0
+"query { paragraphs_aggregate ( where : { document : { document_name : { _eq : ""Summer Show"" } } } ) { aggregate { count } } }",cre_Doc_Template_Mgt,How many paragraphs for the document with name 'Summer Show'?,Medium,4,4,10879.0,2631.0
+"query { paragraphs_aggregate ( where : { document : { document_name : { _eq : ""Summer Show"" } } } ) { aggregate { count } } }",cre_Doc_Template_Mgt,Count the number of paragraphs in the document named 'Summer Show'.,Long,4,4,10879.0,2631.0
+"query { paragraphs ( where : { paragraph_text : { _eq : ""Korea"" } } ) { other_details } }",cre_Doc_Template_Mgt,Show paragraph details for paragraph with text 'Korea'.,Medium,3,3,10879.0,2631.0
+"query { paragraphs ( where : { paragraph_text : { _eq : ""Korea"" } } ) { other_details } }",cre_Doc_Template_Mgt,What are the details for the paragraph that includes the text 'Korea'?,Long,3,3,10879.0,2631.0
+"query { paragraphs ( where : { document : { document_name : { _eq : ""Welcome to NY"" } } } ) { paragraph_id paragraph_text } }",cre_Doc_Template_Mgt,Show all paragraph ids and texts for the document with name 'Welcome to NY'.,Long,4,4,10879.0,2631.0
+"query { paragraphs ( where : { document : { document_name : { _eq : ""Welcome to NY"" } } } ) { paragraph_id paragraph_text } }",cre_Doc_Template_Mgt,What are the ids and texts of paragraphs in the document titled 'Welcome to NY'?,Very Long,4,4,10879.0,2631.0
+"query { paragraphs ( where : { document : { document_name : { _eq : ""Customer reviews"" } } } ) { paragraph_text } }",cre_Doc_Template_Mgt,"Show all paragraph texts for the document ""Customer reviews"".",Medium,4,4,10879.0,2631.0
+"query { paragraphs ( where : { document : { document_name : { _eq : ""Customer reviews"" } } } ) { paragraph_text } }",cre_Doc_Template_Mgt,What are the paragraph texts for the document with the name 'Customer reviews'?,Very Long,4,4,10879.0,2631.0
+query { treatments { date_of_treatment professional { first_name } } },dog_kennels,"List the date of each treatment, together with the first name of the professional who operated it.",Very Long,3,0,21838.0,5266.0
+query { treatments { date_of_treatment professional { first_name } } },dog_kennels,What are the date and the operating professional's first name of each treatment?,Very Long,3,0,21838.0,5266.0
+query { treatments { cost_of_treatment treatment_type { treatment_type_description } } },dog_kennels,List the cost of each treatment and the corresponding treatment type description.,Very Long,3,0,21838.0,5266.0
+query { treatments { cost_of_treatment treatment_type { treatment_type_description } } },dog_kennels,What are the cost and treatment type description of each treatment?,Long,3,0,21838.0,5266.0
+query { owners { first_name last_name dogs { size_code } } },dog_kennels,"List each owner's first name, last name, and the size of his for her dog.",Long,3,0,21838.0,5266.0
+query { owners { first_name last_name dogs { size_code } } },dog_kennels,"What are each owner's first name, last name, and the size of their dog?",Long,3,0,21838.0,5266.0
+query { owners { first_name dogs { name } } },dog_kennels,List pairs of the owner's first name and the dogs's name.,Medium,3,0,21838.0,5266.0
+query { owners { first_name dogs { name } } },dog_kennels,What are each owner's first name and their dogs's name?,Medium,3,0,21838.0,5266.0
+"query { owners ( where : { state : { _eq : ""Virginia"" } } ) { first_name dogs { name } } }",dog_kennels,Which dogs are owned by someone who lives in Virginia? List the owner's first name and the dog's name.,Very Long,3,3,21838.0,5266.0
+"query { owners ( where : { state : { _eq : ""Virginia"" } } ) { first_name dogs { name } } }",dog_kennels,Find the first names of owners living in Virginia and the names of dogs they own.,Very Long,3,3,21838.0,5266.0
+"query { professionals ( where : { _or : [ { state : { _eq : ""Hawaii"" } } , { state : { _eq : ""Wisconsin"" } } ] } ) { email_address } }",dog_kennels,List the emails of the professionals who live in the state of Hawaii or the state of Wisconsin.,Very Long,4,4,21838.0,5266.0
+"query { professionals ( where : { _or : [ { state : { _eq : ""Hawaii"" } } , { state : { _eq : ""Wisconsin"" } } ] } ) { email_address } }",dog_kennels,What are the emails of the professionals living in either the state of Hawaii or the state of Wisconsin?,Very Long,4,4,21838.0,5266.0
+query { dogs { date_arrived date_departed } },dog_kennels,What are the arriving date and the departing date of all the dogs?,Long,2,0,21838.0,5266.0
+query { dogs { date_arrived date_departed } },dog_kennels,List the arrival date and the departure date for all the dogs.,Long,2,0,21838.0,5266.0
+query { treatments_aggregate { aggregate { count } } },dog_kennels,How many dogs went through any treatments?,Short,3,0,21838.0,5266.0
+query { treatments_aggregate { aggregate { count } } },dog_kennels,Count the number of dogs that went through a treatment.,Medium,3,0,21838.0,5266.0
+query { treatments_aggregate { aggregate { count } } },dog_kennels,How many professionals have performed any treatment to dogs?,Medium,3,0,21838.0,5266.0
+query { treatments_aggregate { aggregate { count } } },dog_kennels,Find the number of professionals who have ever treated dogs.,Medium,3,0,21838.0,5266.0
+"query { professionals ( where : { city : { _like : ""%West%"" } } ) { role_code street city state } }",dog_kennels,"Which professionals live in a city containing the substring 'West'? List his or her role, street, city and state.",Very Long,3,3,21838.0,5266.0
+"query { professionals ( where : { city : { _like : ""%West%"" } } ) { role_code street city state } }",dog_kennels,"Find the role, street, city and state of the professionals living in a city that contains the substring 'West'.",Very Long,3,3,21838.0,5266.0
+"query { owners ( where : { state : { _like : ""%North%"" } } ) { first_name last_name email_address } }",dog_kennels,"Which owners live in the state whose name contains the substring 'North'? List his first name, last name and email.",Very Long,3,3,21838.0,5266.0
+"query { owners ( where : { state : { _like : ""%North%"" } } ) { first_name last_name email_address } }",dog_kennels,"Return the first name, last name and email of the owners living in a state whose name contains the substring 'North'.",Very Long,3,3,21838.0,5266.0
+"query { treatments ( limit : 1 , order_by : { date_of_treatment : desc } ) { cost_of_treatment } }",dog_kennels,How much does the most recent treatment cost?,Short,2,2,21838.0,5266.0
+"query { treatments ( limit : 1 , order_by : { date_of_treatment : desc } ) { cost_of_treatment } }",dog_kennels,Show me the cost of the most recently performed treatment.,Medium,2,2,21838.0,5266.0
+"query { dogs ( where : { abandoned_yn : { _eq : ""1"" } } ) { name age weight } }",dog_kennels,"List the dog name, age and weight of the dogs who have been abandoned? 1 stands for yes, and 0 stands for no.",Very Long,3,3,21838.0,5266.0
+"query { dogs ( where : { abandoned_yn : { _eq : ""1"" } } ) { name age weight } }",dog_kennels,"What are the dog name, age and weight of the dogs that were abandoned? Note that 1 stands for yes, and 0 stands for no in the tables.",Very Long,3,3,21838.0,5266.0
+query { dogs_aggregate { aggregate { avg { age } } } },dog_kennels,What is the average age of all the dogs?,Short,4,0,21838.0,5266.0
+query { dogs_aggregate { aggregate { avg { age } } } },dog_kennels,Compute the average age of all the dogs.,Short,4,0,21838.0,5266.0
+query { dogs_aggregate { aggregate { max { age } } } },dog_kennels,What is the age of the oldest dog?,Short,4,0,21838.0,5266.0
+query { dogs_aggregate { aggregate { max { age } } } },dog_kennels,Tell me the age of the oldest dog.,Short,4,0,21838.0,5266.0
+query { charges { charge_type charge_amount } },dog_kennels,How much does each charge type costs? List both charge type and amount.,Long,2,0,21838.0,5266.0
+query { charges { charge_type charge_amount } },dog_kennels,List each charge type and its amount.,Short,2,0,21838.0,5266.0
+query { charges_aggregate { aggregate { max { charge_amount } } } },dog_kennels,How much does the most expensive charge type costs?,Medium,4,0,21838.0,5266.0
+query { charges_aggregate { aggregate { max { charge_amount } } } },dog_kennels,What is the charge amount of the most expensive charge type?,Medium,4,0,21838.0,5266.0
+query { professionals { email_address cell_number home_phone } },dog_kennels,"List the email, cell phone and home phone of all the professionals.",Long,2,0,21838.0,5266.0
+query { professionals { email_address cell_number home_phone } },dog_kennels,"What are the email, cell phone and home phone of each professional?",Long,2,0,21838.0,5266.0
+query { employee_aggregate { aggregate { count } } },employee_hire_evaluation,How many employees are there?,Short,3,0,11206.0,2640.0
+query { employee_aggregate { aggregate { count } } },employee_hire_evaluation,Count the number of employees,Short,3,0,11206.0,2640.0
+query { employee ( order_by : { age : asc } ) { name } },employee_hire_evaluation,Sort employee names by their age in ascending order.,Medium,2,2,11206.0,2640.0
+query { employee ( order_by : { age : asc } ) { name } },employee_hire_evaluation,List the names of employees and sort in ascending order of age.,Long,2,2,11206.0,2640.0
+"query { shop ( limit : 1 , order_by : { number_products : desc } ) { manager_name district } }",employee_hire_evaluation,Find the manager name and district of the shop whose number of products is the largest.,Very Long,2,2,11206.0,2640.0
+"query { shop ( limit : 1 , order_by : { number_products : desc } ) { manager_name district } }",employee_hire_evaluation,What are the manager name and district of the shop that sells the largest number of products?,Very Long,2,2,11206.0,2640.0
+query { shop_aggregate { aggregate { min { number_products } max { number_products } } } },employee_hire_evaluation,find the minimum and maximum number of products of all stores.,Long,4,0,11206.0,2640.0
+query { shop_aggregate { aggregate { min { number_products } max { number_products } } } },employee_hire_evaluation,What are the minimum and maximum number of products across all the shops?,Long,4,0,11206.0,2640.0
+query { shop ( order_by : { number_products : desc } ) { name location district } },employee_hire_evaluation,"Return the name, location and district of all shops in descending order of number of products.",Very Long,2,2,11206.0,2640.0
+query { shop ( order_by : { number_products : desc } ) { name location district } },employee_hire_evaluation,"Sort all the shops by number products in descending order, and return the name, location and district of each shop.",Very Long,2,2,11206.0,2640.0
+"query { employee ( limit : 1 , order_by : { evaluations_aggregate : { max : { bonus : asc } } } ) { name } }",employee_hire_evaluation,Find the name of the employee who got the highest one time bonus.,Long,4,4,11206.0,2640.0
+"query { employee ( limit : 1 , order_by : { evaluations_aggregate : { max : { bonus : asc } } } ) { name } }",employee_hire_evaluation,Which employee received the biggest bonus? Give me the employee name.,Long,4,4,11206.0,2640.0
+query { evaluation_aggregate { aggregate { sum { bonus } } } },employee_hire_evaluation,What is total bonus given in all evaluations?,Short,4,0,11206.0,2640.0
+query { evaluation_aggregate { aggregate { sum { bonus } } } },employee_hire_evaluation,Find the total amount of bonus given in all the evaluations.,Medium,4,0,11206.0,2640.0
+query { hiring { employee_id is_full_time shop_id start_from } },employee_hire_evaluation,Give me all the information about hiring.,Short,2,0,11206.0,2640.0
+query { hiring { employee_id is_full_time shop_id start_from } },employee_hire_evaluation,What is all the information about hiring?,Short,2,0,11206.0,2640.0
+query { shop_aggregate { aggregate { count } } },employee_hire_evaluation,How many different store locations are there?,Short,3,0,11206.0,2640.0
+query { shop_aggregate { aggregate { count } } },employee_hire_evaluation,Count the number of distinct store locations.,Short,3,0,11206.0,2640.0
+"query { airlines ( where : { airline : { _eq : ""JetBlue Airways"" } } ) { country } }",flight_2,"Which country does Airline ""JetBlue Airways"" belong to?",Medium,3,3,8282.0,1986.0
+"query { airlines ( where : { airline : { _eq : ""JetBlue Airways"" } } ) { country } }",flight_2,What country is Jetblue Airways affiliated with?,Medium,3,3,8282.0,1986.0
+"query { airlines ( where : { airline : { _eq : ""JetBlue Airways"" } } ) { abbreviation } }",flight_2,"What is the abbreviation of Airline ""JetBlue Airways""?",Medium,3,3,8282.0,1986.0
+"query { airlines ( where : { airline : { _eq : ""JetBlue Airways"" } } ) { abbreviation } }",flight_2,Which abbreviation corresponds to Jetblue Airways?,Medium,3,3,8282.0,1986.0
+"query { airlines ( where : { country : { _eq : ""USA"" } } ) { airline abbreviation } }",flight_2,"List all airline names and their abbreviations in ""USA"".",Medium,3,3,8282.0,1986.0
+"query { airlines ( where : { country : { _eq : ""USA"" } } ) { airline abbreviation } }",flight_2,What are the airline names and abbreviations for airlines in the USA?,Long,3,3,8282.0,1986.0
+"query { airports ( where : { city : { _eq : ""Anthony"" } } ) { airportcode airportname } }",flight_2,List the airport code and name in the city of Anthony.,Medium,3,3,8282.0,1986.0
+"query { airports ( where : { city : { _eq : ""Anthony"" } } ) { airportcode airportname } }",flight_2,Give the airport code and airport name corresonding to the city Anthony.,Long,3,3,8282.0,1986.0
+query { airlines_aggregate { aggregate { count } } },flight_2,How many airlines do we have?,Short,3,0,8282.0,1986.0
+query { airlines_aggregate { aggregate { count } } },flight_2,What is the total number of airlines?,Short,3,0,8282.0,1986.0
+query { airports_aggregate { aggregate { count } } },flight_2,How many airports do we have?,Short,3,0,8282.0,1986.0
+query { airports_aggregate { aggregate { count } } },flight_2,Return the number of  airports.,Short,3,0,8282.0,1986.0
+query { flights_aggregate { aggregate { count } } },flight_2,How many flights do we have?,Short,3,0,8282.0,1986.0
+query { flights_aggregate { aggregate { count } } },flight_2,Return the number of flights.,Short,3,0,8282.0,1986.0
+"query { airlines ( where : { abbreviation : { _eq : ""UAL"" } } ) { airline } }",flight_2,Which airline has abbreviation 'UAL'?,Short,3,3,8282.0,1986.0
+"query { airlines ( where : { abbreviation : { _eq : ""UAL"" } } ) { airline } }",flight_2,Give the airline with abbreviation 'UAL'.,Short,3,3,8282.0,1986.0
+"query { airlines_aggregate ( where : { country : { _eq : ""USA"" } } ) { aggregate { count } } }",flight_2,How many airlines are from USA?,Short,3,3,8282.0,1986.0
+"query { airlines_aggregate ( where : { country : { _eq : ""USA"" } } ) { aggregate { count } } }",flight_2,Return the number of airlines in the USA.,Short,3,3,8282.0,1986.0
+"query { airports ( where : { airportname : { _eq : ""Alton"" } } ) { city country } }",flight_2,Which city and country is the Alton airport at?,Short,3,3,8282.0,1986.0
+"query { airports ( where : { airportname : { _eq : ""Alton"" } } ) { city country } }",flight_2,Give the city and country for the Alton airport.,Medium,3,3,8282.0,1986.0
+"query { airports ( where : { airportcode : { _eq : ""AKO"" } } ) { airportname } }",flight_2,What is the airport name for airport 'AKO'?,Short,3,3,8282.0,1986.0
+"query { airports ( where : { airportcode : { _eq : ""AKO"" } } ) { airportname } }",flight_2,Return the name of the airport with code 'AKO'.,Short,3,3,8282.0,1986.0
+"query { airports ( where : { city : { _eq : ""Aberdeen"" } } ) { airportname } }",flight_2,What are airport names at City 'Aberdeen'?,Short,3,3,8282.0,1986.0
+"query { airports ( where : { city : { _eq : ""Aberdeen"" } } ) { airportname } }",flight_2,What are the names of airports in Aberdeen?,Short,3,3,8282.0,1986.0
+"query { flights_aggregate ( where : { sourceairport : { _eq : ""APG"" } } ) { aggregate { count } } }",flight_2,How many flights depart from 'APG'?,Short,3,3,8282.0,1986.0
+"query { flights_aggregate ( where : { sourceairport : { _eq : ""APG"" } } ) { aggregate { count } } }",flight_2,Count the number of flights departing from 'APG'.,Medium,3,3,8282.0,1986.0
+"query { flights_aggregate ( where : { destairport : { _eq : ""ATO"" } } ) { aggregate { count } } }",flight_2,How many flights have destination ATO?,Short,3,3,8282.0,1986.0
+"query { flights_aggregate ( where : { destairport : { _eq : ""ATO"" } } ) { aggregate { count } } }",flight_2,Count the number of flights into ATO.,Short,3,3,8282.0,1986.0
+"query { flights_aggregate ( where : { airlineByAirline : { airline : { _eq : ""JetBlue Airways"" } } } ) { aggregate { count } } }",flight_2,How many flights does airline 'JetBlue Airways' have?,Medium,4,4,8282.0,1986.0
+"query { flights_aggregate ( where : { airlineByAirline : { airline : { _eq : ""JetBlue Airways"" } } } ) { aggregate { count } } }",flight_2,Give the number of Jetblue Airways flights.,Short,4,4,8282.0,1986.0
+"query { airlines_aggregate ( where : { _and : { airline : { _eq : ""United Airlines"" } , flights : { destairport : { _eq : ""ASY"" } } } } ) { aggregate { count } } }",flight_2,How many 'United Airlines' flights go to Airport 'ASY'?,Medium,5,5,8282.0,1986.0
+"query { airlines_aggregate ( where : { _and : { flights : { destairport : { _eq : ""ASY"" } } , airline : { _eq : ""United Airlines"" } } } ) { aggregate { count } } }",flight_2,Count the number of United Airlines flights arriving in ASY Airport.,Long,5,5,8282.0,1986.0
+"query { airlines_aggregate ( where : { _and : { flights : { sourceairport : { _eq : ""AHD"" } } , airline : { _eq : ""United Airlines"" } } } ) { aggregate { count } } }",flight_2,How many 'United Airlines' flights depart from Airport 'AHD'?,Medium,5,5,8282.0,1986.0
+"query { airlines_aggregate ( where : { _and : { flights : { sourceairport : { _eq : ""AHD"" } } , airline : { _eq : ""United Airlines"" } } } ) { aggregate { count } } }",flight_2,Return the number of United Airlines flights leaving from AHD Airport.,Long,5,5,8282.0,1986.0
+"query { airlines ( where : { flights : { sourceairport : { _eq : ""AHD"" } } } ) { airline } }",flight_2,What are airlines that have some flight departing from airport 'AHD'?,Long,4,4,8282.0,1986.0
+"query { airlines ( where : { flights : { sourceairport : { _eq : ""AHD"" } } } ) { airline } }",flight_2,Which airlines have a flight with source airport AHD?,Medium,4,4,8282.0,1986.0
+"query { airlines ( where : { flights : { destairport : { _eq : ""AHD"" } } } ) { airline } }",flight_2,What are airlines that have flights arriving at airport 'AHD'?,Long,4,4,8282.0,1986.0
+"query { airlines ( where : { flights : { destairport : { _eq : ""AHD"" } } } ) { airline } }",flight_2,Which airlines have a flight with destination airport AHD?,Medium,4,4,8282.0,1986.0
+"query { flights ( where : { airlineByAirline : { airline : { _eq : ""United Airlines"" } } } ) { flightno } }",flight_2,"What are flight numbers of Airline ""United Airlines""?",Medium,4,4,8282.0,1986.0
+"query { flights ( where : { airlineByAirline : { airline : { _eq : ""United Airlines"" } } } ) { flightno } }",flight_2,Which flight numbers correspond to United Airlines flights?,Medium,4,4,8282.0,1986.0
+"query { flights ( where : { sourceairport : { _eq : ""APG"" } } ) { flightno } }",flight_2,"What are flight numbers of flights departing from Airport ""APG""?",Long,3,3,8282.0,1986.0
+"query { flights ( where : { sourceairport : { _eq : ""APG"" } } ) { flightno } }",flight_2,Give the flight numbers of flights leaving from APG.,Medium,3,3,8282.0,1986.0
+"query { flights ( where : { destairport : { _eq : ""APG"" } } ) { flightno } }",flight_2,"What are flight numbers of flights arriving at Airport ""APG""?",Medium,3,3,8282.0,1986.0
+"query { flights ( where : { destairport : { _eq : ""APG"" } } ) { flightno } }",flight_2,Give the flight numbers of flights landing at APG.,Medium,3,3,8282.0,1986.0
+query { visitor_aggregate ( where : { age : { _lt : 30 } } ) { aggregate { count } } },museum_visit,How many visitors below age 30 are there?,Short,3,3,9140.0,2157.0
+"query { visitor ( order_by : { level_of_membership : desc } , where : { level_of_membership : { _gt : 4 } } ) { name } }",museum_visit,"Find the names of the visitors whose membership level is higher than 4, and order the results by the level from high to low.",Very Long,3,3,9140.0,2157.0
+query { visitor_aggregate ( where : { level_of_membership : { _lte : 4 } } ) { aggregate { avg { age } } } },museum_visit,What is the average age of the visitors whose membership level is not higher than 4?,Very Long,4,3,9140.0,2157.0
+"query { visitor ( order_by : { age : desc } , where : { level_of_membership : { _gt : 4 } } ) { name level_of_membership } }",museum_visit,"Find the name and membership level of the visitors whose membership level is higher than 4, and sort by their age from old to young.",Very Long,3,4,9140.0,2157.0
+"query { museum ( limit : 1 , order_by : { num_of_staff : desc } ) { museum_id name } }",museum_visit,Find the id and name of the museum that has the most staff members?,Long,2,2,9140.0,2157.0
+"query { museum_aggregate ( where : { open_year : { _lt : ""2009"" } } ) { aggregate { avg { num_of_staff } } } }",museum_visit,Find the average number of staff working for the museums that were open before 2009.,Very Long,4,3,9140.0,2157.0
+"query { museum ( where : { name : { _eq : ""Plaza Museum"" } } ) { num_of_staff open_year } }",museum_visit,What are the opening year and staff number of the museum named Plaza Museum?,Long,3,3,9140.0,2157.0
+"query { visitor ( limit : 1 , order_by : { visits_aggregate : { max : { num_of_ticket : desc_nulls_last } } } ) { name age } }",museum_visit,Find the name and age of the visitor who bought the most tickets at once.,Long,4,4,9140.0,2157.0
+query { visit_aggregate { aggregate { avg { num_of_ticket } max { num_of_ticket } } } },museum_visit,What are the average and maximum number of tickets bought in all visits?,Long,4,0,9140.0,2157.0
+query { visit_aggregate ( where : { visitor : { level_of_membership : { _eq : 1 } } } ) { aggregate { sum { total_spent } } } },museum_visit,What is the total ticket expense of the visitors whose membership level is 1?,Long,4,4,9140.0,2157.0
+"query { museum_aggregate ( where : { _or : [ { open_year : { _gt : ""2013"" } } , { open_year : { _lt : ""2008"" } } ] } ) { aggregate { count } } }",museum_visit,How many museums were opened after 2013 or before 2008?,Medium,4,5,9140.0,2157.0
+query { highschooler_aggregate { aggregate { count } } },network_1,How many high schoolers are there?,Short,3,0,8867.0,2201.0
+query { highschooler_aggregate { aggregate { count } } },network_1,Count the number of high schoolers.,Short,3,0,8867.0,2201.0
+query { highschooler { name grade } },network_1,Show the names and grades of each high schooler.,Medium,2,0,8867.0,2201.0
+query { highschooler { name grade } },network_1,What are the names and grades for each high schooler?,Medium,2,0,8867.0,2201.0
+query { highschooler { grade } },network_1,Show all the grades of the high schoolers.,Short,2,0,8867.0,2201.0
+query { highschooler { grade } },network_1,What is the grade of each high schooler?,Short,2,0,8867.0,2201.0
+"query { highschooler ( where : { name : { _eq : ""Kyle"" } } ) { grade } }",network_1,What grade is Kyle in?,Short,3,3,8867.0,2201.0
+"query { highschooler ( where : { name : { _eq : ""Kyle"" } } ) { grade } }",network_1,Return the grade for the high schooler named Kyle.,Medium,3,3,8867.0,2201.0
+query { highschooler ( where : { grade : { _eq : 10 } } ) { name } },network_1,Show the names of all high schoolers in grade 10.,Medium,3,3,8867.0,2201.0
+query { highschooler ( where : { grade : { _eq : 10 } } ) { name } },network_1,What are the names of all high schoolers in grade 10?,Medium,3,3,8867.0,2201.0
+"query { highschooler ( where : { name : { _eq : ""Kyle"" } } ) { id } }",network_1,Show the ID of the high schooler named Kyle.,Short,3,3,8867.0,2201.0
+"query { highschooler ( where : { name : { _eq : ""Kyle"" } } ) { id } }",network_1,What is Kyle's id?,,3,3,8867.0,2201.0
+"query { highschooler_aggregate ( where : { _or : [ { grade : { _eq : 9 } } , { grade : { _eq : 10 } } ] } ) { aggregate { count } } }",network_1,How many high schoolers are there in grade 9 or 10?,Medium,4,4,8867.0,2201.0
+"query { highschooler_aggregate ( where : { _or : [ { grade : { _eq : 9 } } , { grade : { _eq : 10 } } ] } ) { aggregate { count } } }",network_1,Count the number of high schoolers in grades 9 or 10.,Medium,4,4,8867.0,2201.0
+"query { highschooler ( where : { name : { _eq : ""Kyle"" } } ) { name } }",network_1,Show the names of all of the high schooler Kyle's friends.,Medium,3,3,8867.0,2201.0
+"query { highschooler ( where : { name : { _eq : ""Kyle"" } } ) { name } }",network_1,Return the names of friends of the high school student Kyle.,Medium,3,3,8867.0,2201.0
+query { conductor_aggregate { aggregate { count } } },orchestra,How many conductors are there?,Short,3,0,12149.0,2858.0
+query { conductor_aggregate { aggregate { count } } },orchestra,Count the number of conductors.,Short,3,0,12149.0,2858.0
+query { conductor ( order_by : { age : asc } ) { name } },orchestra,List the names of conductors in ascending order of age.,Medium,2,2,12149.0,2858.0
+query { conductor ( order_by : { age : asc } ) { name } },orchestra,"What are the names of conductors, ordered by age?",Medium,2,2,12149.0,2858.0
+"query { conductor ( where : { nationality : { _neq : ""USA"" } } ) { name } }",orchestra,"What are the names of conductors whose nationalities are not ""USA""?",Long,3,3,12149.0,2858.0
+"query { conductor ( where : { nationality : { _neq : ""USA"" } } ) { name } }",orchestra,"Return the names of conductors that do not have the nationality ""USA"".",Long,3,3,12149.0,2858.0
+query { orchestra ( order_by : { year_of_founded : desc } ) { record_company } },orchestra,What are the record companies of orchestras in descending order of years in which they were founded?,Very Long,2,2,12149.0,2858.0
+query { orchestra ( order_by : { year_of_founded : desc } ) { record_company } },orchestra,"Return the record companies of orchestras, sorted descending by the years in which they were founded.",Very Long,2,2,12149.0,2858.0
+query { show_aggregate { aggregate { avg { attendance } } } },orchestra,What is the average attendance of shows?,Short,4,0,12149.0,2858.0
+query { show_aggregate { aggregate { avg { attendance } } } },orchestra,Return the average attendance across all shows.,Short,4,0,12149.0,2858.0
+"query { performance_aggregate ( where : { type : { _neq : ""Live final"" } } ) { aggregate { max { share } min { share } } } }",orchestra,"What are the maximum and minimum share of performances whose type is not ""Live final"".",Very Long,4,3,12149.0,2858.0
+"query { performance_aggregate ( where : { type : { _neq : ""Live final"" } } ) { aggregate { max { share } min { share } } } }",orchestra,"Return the maximum and minimum shares for performances that do not have the type ""Live final"".",Very Long,4,3,12149.0,2858.0
+query { conductor_aggregate { aggregate { count } } },orchestra,How many different nationalities do conductors have?,Medium,3,0,12149.0,2858.0
+query { conductor_aggregate { aggregate { count } } },orchestra,Count the number of different nationalities of conductors.,Medium,3,0,12149.0,2858.0
+query { conductor ( order_by : { year_of_work : desc } ) { name } },orchestra,List names of conductors in descending order of years of work.,Long,2,2,12149.0,2858.0
+query { conductor ( order_by : { year_of_work : desc } ) { name } },orchestra,"What are the names of conductors, sorted descending by the number of years they have worked?",Very Long,2,2,12149.0,2858.0
+"query { conductor ( limit : 1 , order_by : { year_of_work : desc } ) { name } }",orchestra,List the name of the conductor with the most years of work.,Medium,2,2,12149.0,2858.0
+"query { conductor ( limit : 1 , order_by : { year_of_work : desc } ) { name } }",orchestra,What is the name of the conductor who has worked the greatest number of years?,Very Long,2,2,12149.0,2858.0
+query { conductor { name orchestras { orchestra } } },orchestra,Show the names of conductors and the orchestras they have conducted.,Long,3,0,12149.0,2858.0
+query { conductor { name orchestras { orchestra } } },orchestra,What are the names of conductors as well as the corresonding orchestras that they have conducted?,Very Long,3,0,12149.0,2858.0
+query { conductor ( where : { orchestras : { year_of_founded : { _gt : 2008.0 } } } ) { name } },orchestra,Please show the name of the conductor that has conducted orchestras founded after 2008.,Very Long,4,4,12149.0,2858.0
+query { conductor ( where : { orchestras : { year_of_founded : { _gt : 2008.0 } } } ) { name } },orchestra,What are the names of conductors who have conducted orchestras founded after the year 2008?,Very Long,4,4,12149.0,2858.0
+"query { orchestra_aggregate ( where : { _or : [ { major_record_format : { _eq : ""CD"" } } , { major_record_format : { _eq : ""DVD"" } } ] } ) { aggregate { count } } }",orchestra,"Find the number of orchestras whose record format is ""CD"" or ""DVD"".",Long,4,4,12149.0,2858.0
+"query { orchestra_aggregate ( where : { _or : [ { major_record_format : { _eq : ""CD"" } } , { major_record_format : { _eq : ""DVD"" } } ] } ) { aggregate { count } } }",orchestra,Count the number of orchestras that have CD or DVD as their record format.,Long,4,4,12149.0,2858.0
+query { pets_aggregate ( where : { weight : { _gt : 10.0 } } ) { aggregate { count } } },pets_1,Find the number of pets whose weight is heavier than 10.,Medium,3,3,9543.0,2294.0
+query { pets_aggregate ( where : { weight : { _gt : 10.0 } } ) { aggregate { count } } },pets_1,How many pets have a greater weight than 10?,Short,3,3,9543.0,2294.0
+"query { pets ( limit : 1 , order_by : { pet_age : asc } ) { weight } }",pets_1,Find the weight of the youngest dog.,Short,2,2,9543.0,2294.0
+"query { pets ( limit : 1 , order_by : { pet_age : asc } ) { weight } }",pets_1,How much does the youngest dog weigh?,Short,2,2,9543.0,2294.0
+query { student_aggregate ( where : { age : { _gt : 20 } } ) { aggregate { count } } },pets_1,Find number of pets owned by students who are older than 20.,Medium,3,3,9543.0,2294.0
+query { student_aggregate ( where : { age : { _gt : 20 } } ) { aggregate { count } } },pets_1,How many pets are owned by students that have an age greater than 20?,Long,3,3,9543.0,2294.0
+query { pets_aggregate { aggregate { count } } },pets_1,Find the number of distinct type of pets.,Short,3,0,9543.0,2294.0
+query { pets_aggregate { aggregate { count } } },pets_1,How many different types of pet are there?,Short,3,0,9543.0,2294.0
+"query { pets ( limit : 1 , order_by : { pet_age : asc } ) { pettype weight } }",pets_1,Find the type and weight of the youngest pet.,Short,2,2,9543.0,2294.0
+"query { pets ( limit : 1 , order_by : { pet_age : asc } ) { pettype weight } }",pets_1,"What type of pet is the youngest animal, and how much does it weigh?",Long,2,2,9543.0,2294.0
+query { pets ( where : { pet_age : { _gt : 1 } } ) { petid weight } },pets_1,Find the id and weight of all pets whose age is older than 1.,Medium,3,3,9543.0,2294.0
+query { pets ( where : { pet_age : { _gt : 1 } } ) { petid weight } },pets_1,What is the id and weight of every pet who is older than 1?,Medium,3,3,9543.0,2294.0
+"query { has_pet ( where : { student : { lname : { _eq : ""Smith"" } } } ) { petid } }",pets_1,Find the id of the pet owned by student whose last name is ‘Smith’.,Long,4,4,9543.0,2294.0
+"query { has_pet ( where : { student : { lname : { _eq : ""Smith"" } } } ) { petid } }",pets_1,What is the id of the pet owned by the student whose last name is 'Smith'?,Long,4,4,9543.0,2294.0
+query { poker_player_aggregate { aggregate { count } } },poker_player,How many poker players are there?,Short,3,0,7207.0,1642.0
+query { poker_player_aggregate { aggregate { count } } },poker_player,Count the number of poker players.,Short,3,0,7207.0,1642.0
+query { poker_player ( order_by : { earnings : desc } ) { earnings } },poker_player,List the earnings of poker players in descending order.,Medium,2,2,7207.0,1642.0
+query { poker_player ( order_by : { earnings : desc } ) { earnings } },poker_player,"What are the earnings of poker players, ordered descending by value?",Long,2,2,7207.0,1642.0
+query { poker_player { final_table_made best_finish } },poker_player,List the final tables made and the best finishes of poker players.,Long,2,0,7207.0,1642.0
+query { poker_player { final_table_made best_finish } },poker_player,What are the final tables made and best finishes for all poker players?,Long,2,0,7207.0,1642.0
+query { poker_player_aggregate { aggregate { avg { earnings } } } },poker_player,What is the average earnings of poker players?,Short,4,0,7207.0,1642.0
+query { poker_player_aggregate { aggregate { avg { earnings } } } },poker_player,Return the average earnings across all poker players.,Medium,4,0,7207.0,1642.0
+"query { poker_player ( limit : 1 , order_by : { earnings : desc } ) { money_rank } }",poker_player,What is the money rank of the poker player with the highest earnings?,Long,2,2,7207.0,1642.0
+"query { poker_player ( limit : 1 , order_by : { earnings : desc } ) { money_rank } }",poker_player,Return the money rank of the player with the greatest earnings.,Long,2,2,7207.0,1642.0
+query { poker_player_aggregate ( where : { earnings : { _lt : 200000.0 } } ) { aggregate { max { final_table_made } } } },poker_player,What is the maximum number of final tables made among poker players with earnings less than 200000?,Very Long,4,3,7207.0,1642.0
+query { poker_player_aggregate ( where : { earnings : { _lt : 200000.0 } } ) { aggregate { max { final_table_made } } } },poker_player,Return the maximum final tables made across all poker players who have earnings below 200000.,Very Long,4,3,7207.0,1642.0
+query { people { name } },poker_player,What are the names of poker players?,Short,2,0,7207.0,1642.0
+query { people { name } },poker_player,Return the names of all the poker players.,Short,2,0,7207.0,1642.0
+query { people ( where : { poker_players : { earnings : { _gt : 300000.0 } } } ) { name } },poker_player,What are the names of poker players whose earnings is higher than 300000?,Long,4,4,7207.0,1642.0
+query { people ( where : { poker_players : { earnings : { _gt : 300000.0 } } } ) { name } },poker_player,Give the names of poker players who have earnings above 300000.,Long,4,4,7207.0,1642.0
+query { people ( order_by : { poker_players_aggregate : { min : { final_table_made : asc } } } ) { name } },poker_player,List the names of poker players ordered by the final tables made in ascending order.,Very Long,4,4,7207.0,1642.0
+query { people ( order_by : { poker_players_aggregate : { min : { final_table_made : asc } } } ) { name } },poker_player,"What are the names of poker players, ordered ascending by the number of final tables they have made?",Very Long,4,4,7207.0,1642.0
+"query { people ( limit : 1 , order_by : { poker_players_aggregate : { min : { earnings : asc } } } ) { birth_date } }",poker_player,What is the birth date of the poker player with the lowest earnings?,Long,4,4,7207.0,1642.0
+"query { people ( limit : 1 , order_by : { poker_players_aggregate : { min : { earnings : asc } } } ) { birth_date } }",poker_player,Return the birth date of the poker player with the lowest earnings.,Long,4,4,7207.0,1642.0
+"query { poker_player ( limit : 1 , order_by : { person : { height : desc } } ) { money_rank } }",poker_player,What is the money rank of the tallest poker player?,Medium,3,3,7207.0,1642.0
+"query { poker_player ( limit : 1 , order_by : { person : { height : desc } } ) { money_rank } }",poker_player,Return the money rank of the poker player with the greatest height.,Long,3,3,7207.0,1642.0
+query { poker_player_aggregate ( where : { person : { height : { _gt : 200.0 } } } ) { aggregate { avg { earnings } } } },poker_player,What is the average earnings of poker players with height higher than 200?,Long,4,4,7207.0,1642.0
+query { poker_player_aggregate ( where : { person : { height : { _gt : 200.0 } } } ) { aggregate { avg { earnings } } } },poker_player,Give average earnings of poker players who are taller than 200.,Long,4,4,7207.0,1642.0
+query { people ( order_by : { poker_players_aggregate : { max : { earnings : desc_nulls_last } } } ) { name } },poker_player,What are the names of poker players in descending order of earnings?,Long,4,4,7207.0,1642.0
+query { people ( order_by : { poker_players_aggregate : { max : { earnings : desc_nulls_last } } } ) { name } },poker_player,Return the names of poker players sorted by their earnings descending.,Long,4,4,7207.0,1642.0
+query { people ( order_by : { name : asc } ) { name birth_date } },poker_player,List the names and birth dates of people in ascending alphabetical order of name.,Very Long,2,2,7207.0,1642.0
+query { people ( order_by : { name : asc } ) { name birth_date } },poker_player,"What are the names and birth dates of people, ordered by their names in alphabetical order?",Very Long,2,2,7207.0,1642.0
+"query { people ( where : { nationality : { _neq : ""Russia"" } } ) { name } }",poker_player,"Show names of people whose nationality is not ""Russia"".",Medium,3,3,7207.0,1642.0
+"query { people ( where : { nationality : { _neq : ""Russia"" } } ) { name } }",poker_player,What are the names of people who are not from Russia?,Medium,3,3,7207.0,1642.0
+query { people_aggregate { aggregate { count } } },poker_player,How many distinct nationalities are there?,Short,3,0,7207.0,1642.0
+query { people_aggregate { aggregate { count } } },poker_player,Count the number of different nationalities.,Short,3,0,7207.0,1642.0
+query { other_available_features_aggregate { aggregate { count } } },real_estate_properties,How many available features are there in total?,Short,3,0,14798.0,3476.0
+"query { ref_feature_types ( where : { other_available_features : { feature_name : { _eq : ""AirCon"" } } } ) { feature_type_name } }",real_estate_properties,What is the feature type name of feature AirCon?,Medium,4,4,14798.0,3476.0
+query { singer_aggregate { aggregate { count } } },singer,How many singers are there?,Short,3,0,6913.0,1576.0
+query { singer_aggregate { aggregate { count } } },singer,What is the count of singers?,Short,3,0,6913.0,1576.0
+query { singer ( order_by : { net_worth_millions : asc } ) { name } },singer,List the name of singers in ascending order of net worth.,Medium,2,2,6913.0,1576.0
+query { singer ( order_by : { net_worth_millions : asc } ) { name } },singer,What are the names of singers ordered by ascending net worth?,Medium,2,2,6913.0,1576.0
+query { singer { birth_year citizenship } },singer,What are the birth year and citizenship of singers?,Medium,2,0,6913.0,1576.0
+query { singer { birth_year citizenship } },singer,What are the birth years and citizenships of the singers?,Medium,2,0,6913.0,1576.0
+"query { singer ( where : { citizenship : { _neq : ""France"" } } ) { name } }",singer,"List the name of singers whose citizenship is not ""France"".",Medium,3,3,6913.0,1576.0
+"query { singer ( where : { citizenship : { _neq : ""France"" } } ) { name } }",singer,What are the names of the singers who are not French citizens?,Long,3,3,6913.0,1576.0
+"query { singer ( where : { _or : [ { birth_year : { _eq : 1948.0 } } , { birth_year : { _eq : 1949.0 } } ] } ) { name } }",singer,Show the name of singers whose birth year is either 1948 or 1949?,Long,4,4,6913.0,1576.0
+"query { singer ( where : { _or : [ { birth_year : { _eq : 1948.0 } } , { birth_year : { _eq : 1949.0 } } ] } ) { name } }",singer,What are the names of the singers whose birth years are either 1948 or 1949?,Long,4,4,6913.0,1576.0
+"query { singer ( limit : 1 , order_by : { net_worth_millions : desc } ) { name } }",singer,What is the name of the singer with the largest net worth?,Medium,2,2,6913.0,1576.0
+"query { singer ( limit : 1 , order_by : { net_worth_millions : desc } ) { name } }",singer,What is the name of the singer who is worth the most?,Medium,2,2,6913.0,1576.0
+query { song { title singer { name } } },singer,Show titles of songs and names of singers.,Short,3,0,6913.0,1576.0
+query { song { title singer { name } } },singer,What are the song titles and singer names?,Short,3,0,6913.0,1576.0
+"query { singer ( where : { songs : { sales : { _gt : 300000.0 } } } , distinct_on : name ) { name } }",singer,Show distinct names of singers that have songs with sales more than 300000.,Long,4,4,6913.0,1576.0
+"query { singer ( where : { songs : { sales : { _gt : 300000.0 } } } , distinct_on : name ) { name } }",singer,what are the different names of the singers that have sales more than 300000?,Long,4,4,6913.0,1576.0
+query { addresses { line_1 line_2 } },student_transcripts_tracking,what are all the addresses including line 1 and line 2?,Medium,2,0,30935.0,7751.0
+query { addresses { line_1 line_2 } },student_transcripts_tracking,What is the first and second line for all addresses?,Medium,2,0,30935.0,7751.0
+query { courses_aggregate { aggregate { count } } },student_transcripts_tracking,How many courses in total are listed?,Short,3,0,30935.0,7751.0
+query { courses_aggregate { aggregate { count } } },student_transcripts_tracking,How many courses are there?,Short,3,0,30935.0,7751.0
+"query { courses ( where : { course_name : { _eq : ""math"" } } ) { course_description } }",student_transcripts_tracking,How is the math course described?,Short,3,3,30935.0,7751.0
+"query { courses ( where : { course_name : { _eq : ""math"" } } ) { course_description } }",student_transcripts_tracking,What are the descriptions for all the math courses?,Medium,3,3,30935.0,7751.0
+"query { addresses ( where : { city : { _eq : ""Port Chelsea"" } } ) { zip_postcode } }",student_transcripts_tracking,What is the zip code of the address in the city Port Chelsea?,Medium,3,3,30935.0,7751.0
+"query { addresses ( where : { city : { _eq : ""Port Chelsea"" } } ) { zip_postcode } }",student_transcripts_tracking,What is the zip code for Port Chelsea?,Short,3,3,30935.0,7751.0
+query { degree_programs_aggregate { aggregate { count } } },student_transcripts_tracking,How many departments offer any degree?,Short,3,0,30935.0,7751.0
+query { degree_programs_aggregate { aggregate { count } } },student_transcripts_tracking,How many different departments offer degrees?,Short,3,0,30935.0,7751.0
+query { degree_programs_aggregate { aggregate { count } } },student_transcripts_tracking,How many different degree names are offered?,Short,3,0,30935.0,7751.0
+query { degree_programs_aggregate { aggregate { count } } },student_transcripts_tracking,How many different degrees are offered?,Short,3,0,30935.0,7751.0
+"query { departments_aggregate ( where : { department_name : { _eq : ""engineer"" } } ) { aggregate { count } } }",student_transcripts_tracking,How many degrees does the engineering department offer?,Medium,3,3,30935.0,7751.0
+"query { departments_aggregate ( where : { department_name : { _eq : ""engineer"" } } ) { aggregate { count } } }",student_transcripts_tracking,How many degrees does the engineering department have?,Medium,3,3,30935.0,7751.0
+query { sections { section_name section_description } },student_transcripts_tracking,What are the names and descriptions of all the sections?,Medium,2,0,30935.0,7751.0
+query { sections { section_name section_description } },student_transcripts_tracking,What are the names and descriptions for all the sections?,Medium,2,0,30935.0,7751.0
+query { sections ( order_by : { section_name : desc } ) { section_name } },student_transcripts_tracking,List the section_name in reversed lexicographical order.,Medium,2,2,30935.0,7751.0
+query { sections ( order_by : { section_name : desc } ) { section_name } },student_transcripts_tracking,What are the names of the sections in reverse alphabetical order?,Long,2,2,30935.0,7751.0
+"query { departments ( where : { department_name : { _like : ""%computer%"" } } ) { department_description } }",student_transcripts_tracking,What is the description of the department whose name has the substring the computer?,Very Long,3,3,30935.0,7751.0
+"query { departments ( where : { department_name : { _like : ""%computer%"" } } ) { department_description } }",student_transcripts_tracking,What is the department description for the one whose name has the word computer?,Very Long,3,3,30935.0,7751.0
+query { courses ( distinct_on : course_name ) { course_name } },student_transcripts_tracking,What are all the course names of the courses which ever have students enrolled in?,Very Long,2,1,30935.0,7751.0
+query { courses ( distinct_on : course_name ) { course_name } },student_transcripts_tracking,What are the names of all courses that have some students enrolled?,Long,2,1,30935.0,7751.0
+"query { students ( where : { _and : { first_name : { _eq : ""Timmothy"" } , last_name : { _eq : ""Ward"" } } } ) { cell_mobile_number } }",student_transcripts_tracking,What is the phone number of the man with the first name Timmothy and the last name Ward?,Very Long,4,4,30935.0,7751.0
+"query { students ( where : { _and : { last_name : { _eq : ""Ward"" } , first_name : { _eq : ""Timmothy"" } } } ) { cell_mobile_number } }",student_transcripts_tracking,What is the mobile phone number of the student named Timothy Ward?,Long,4,4,30935.0,7751.0
+"query { students ( limit : 1 , order_by : { date_first_registered : asc } ) { first_name middle_name last_name } }",student_transcripts_tracking,"Who is the first student to register? List the first name, middle name and last name.",Very Long,2,2,30935.0,7751.0
+"query { students ( limit : 1 , order_by : { date_first_registered : asc } ) { first_name middle_name last_name } }",student_transcripts_tracking,"What is the first, middle, and last name of the first student to register?",Long,2,2,30935.0,7751.0
+"query { students ( limit : 1 , order_by : { date_left : asc } ) { first_name middle_name last_name } }",student_transcripts_tracking,"Who is the earliest graduate of the school? List the first name, middle name and last name.",Very Long,2,2,30935.0,7751.0
+"query { students ( limit : 1 , order_by : { date_left : asc } ) { first_name middle_name last_name } }",student_transcripts_tracking,"What is the first, middle, and last name of the earliest school graduate?",Long,2,2,30935.0,7751.0
+query { transcripts_aggregate { aggregate { max { transcript_date } } } },student_transcripts_tracking,What was the last transcript released?,Short,4,0,30935.0,7751.0
+query { transcripts_aggregate { aggregate { max { transcript_date } } } },student_transcripts_tracking,What is the date of the last transcript released?,Medium,4,0,30935.0,7751.0
+"query { transcripts ( limit : 1 , order_by : { transcript_date : asc } ) { transcript_date other_details } }",student_transcripts_tracking,When is the first transcript released? List the date and details.,Long,2,2,30935.0,7751.0
+"query { transcripts ( limit : 1 , order_by : { transcript_date : asc } ) { transcript_date other_details } }",student_transcripts_tracking,"What is the earliest date of a transcript release, and what details can you tell me?",Very Long,2,2,30935.0,7751.0
+query { transcripts_aggregate { aggregate { count } } },student_transcripts_tracking,How many transcripts are released?,Short,3,0,30935.0,7751.0
+query { transcripts_aggregate { aggregate { count } } },student_transcripts_tracking,How many transcripts are listed?,Short,3,0,30935.0,7751.0
+"query { transcripts ( limit : 1 , order_by : { transcript_date : desc } ) { transcript_date } }",student_transcripts_tracking,What is the last transcript release date?,Short,2,2,30935.0,7751.0
+"query { transcripts ( limit : 1 , order_by : { transcript_date : desc } ) { transcript_date } }",student_transcripts_tracking,When was the last transcript released?,Short,2,2,30935.0,7751.0
+query { students_aggregate { aggregate { count } } },student_transcripts_tracking,How many different addresses do the students currently live?,Medium,3,0,30935.0,7751.0
+query { students_aggregate { aggregate { count } } },student_transcripts_tracking,What are the different addresses that have students living there?,Long,3,0,30935.0,7751.0
+query { students ( order_by : { other_student_details : desc } ) { other_student_details } },student_transcripts_tracking,List all the student details in reversed lexicographical order.,Long,2,2,30935.0,7751.0
+query { students ( order_by : { other_student_details : desc } ) { other_student_details } },student_transcripts_tracking,What other details can you tell me about students in reverse alphabetical order?,Very Long,2,2,30935.0,7751.0
+"query { sections ( where : { section_name : { _eq : ""h"" } } ) { section_description } }",student_transcripts_tracking,Describe the section h.,Short,3,3,30935.0,7751.0
+"query { sections ( where : { section_name : { _eq : ""h"" } } ) { section_description } }",student_transcripts_tracking,What is the description for the section named h?,Medium,3,3,30935.0,7751.0
+query { cartoon ( order_by : { title : asc } ) { title } },tvshow,List the title of all cartoons in alphabetical order.,Medium,2,2,9663.0,2249.0
+query { cartoon ( order_by : { title : asc } ) { title } },tvshow,What are the titles of the cartoons sorted alphabetically?,Medium,2,2,9663.0,2249.0
+"query { cartoon ( where : { directed_by : { _eq : ""Ben Jones"" } } ) { title } }",tvshow,"List all cartoon directed by ""Ben Jones"".",Short,3,3,9663.0,2249.0
+"query { cartoon ( where : { directed_by : { _eq : ""Ben Jones"" } } ) { title } }",tvshow,What are the names of all cartoons directed by Ben Jones?,Medium,3,3,9663.0,2249.0
+"query { cartoon_aggregate ( where : { written_by : { _eq : ""Joseph Kuhr"" } } ) { aggregate { count } } }",tvshow,"How many cartoons were written by ""Joseph Kuhr""?",Medium,3,3,9663.0,2249.0
+"query { cartoon_aggregate ( where : { written_by : { _eq : ""Joseph Kuhr"" } } ) { aggregate { count } } }",tvshow,What is the number of cartoones written by Joseph Kuhr?,Medium,3,3,9663.0,2249.0
+query { cartoon ( order_by : { original_air_date : asc } ) { title directed_by } },tvshow,list all cartoon titles and their directors ordered by their air date,Long,2,2,9663.0,2249.0
+query { cartoon ( order_by : { original_air_date : asc } ) { title directed_by } },tvshow,What is the name and directors of all the cartoons that are ordered by air date?,Very Long,2,2,9663.0,2249.0
+"query { cartoon ( where : { _or : [ { directed_by : { _eq : ""Ben Jones"" } } , { directed_by : { _eq : ""Brandon Vietti"" } } ] } ) { title } }",tvshow,"List the title of all cartoon directed by ""Ben Jones"" or ""Brandon Vietti"".",Long,4,4,9663.0,2249.0
+"query { cartoon ( where : { _or : [ { directed_by : { _eq : ""Ben Jones"" } } , { directed_by : { _eq : ""Brandon Vietti"" } } ] } ) { title } }",tvshow,What are the titles of all cartoons directed by Ben Jones or Brandon Vietti?,Long,4,4,9663.0,2249.0
+query { tv_channel_aggregate { aggregate { count count } } },tvshow,List the number of different series names and contents in the TV Channel table.,Very Long,3,0,9663.0,2249.0
+query { tv_channel_aggregate { aggregate { count count } } },tvshow,How many different series and contents are listed in the TV Channel table?,Long,3,0,9663.0,2249.0
+"query { tv_channel ( where : { series_name : { _eq : ""Sky Radio"" } } ) { content } }",tvshow,"What is the content of TV Channel with serial name ""Sky Radio""?",Long,3,3,9663.0,2249.0
+"query { tv_channel ( where : { series_name : { _eq : ""Sky Radio"" } } ) { content } }",tvshow,What is the content of the series Sky Radio?,Short,3,3,9663.0,2249.0
+"query { tv_channel ( where : { series_name : { _eq : ""Sky Radio"" } } ) { package_option } }",tvshow,"What is the Package Option of TV Channel with serial name ""Sky Radio""?",Long,3,3,9663.0,2249.0
+"query { tv_channel ( where : { series_name : { _eq : ""Sky Radio"" } } ) { package_option } }",tvshow,What are the Package Options of the TV Channels whose series names are Sky Radio?,Very Long,3,3,9663.0,2249.0
+"query { tv_channel_aggregate ( where : { language : { _eq : ""English"" } } ) { aggregate { count } } }",tvshow,How many TV Channel using language English?,Short,3,3,9663.0,2249.0
+"query { tv_channel_aggregate ( where : { language : { _eq : ""English"" } } ) { aggregate { count } } }",tvshow,How many TV Channels use the English language?,Short,3,3,9663.0,2249.0
+"query { tv_channel ( where : { cartoons : { title : { _eq : ""The Rise of the Blue Beetle!"" } } } ) { series_name } }",tvshow,"What is the TV Channel that shows the cartoon ""The Rise of the Blue Beetle!""? List the TV Channel's series name.",Very Long,4,4,9663.0,2249.0
+"query { tv_channel ( where : { cartoons : { title : { _eq : ""The Rise of the Blue Beetle!"" } } } ) { series_name } }",tvshow,"What is the series name of the TV Channel that shows the cartoon ""The Rise of the Blue Beetle""?",Very Long,4,4,9663.0,2249.0
+"query { cartoon ( where : { tv_channel : { series_name : { _eq : ""Sky Radio"" } } } ) { title } }",tvshow,"List the title of all  Cartoons showed on TV Channel with series name ""Sky Radio"".",Very Long,4,4,9663.0,2249.0
+"query { cartoon ( where : { tv_channel : { series_name : { _eq : ""Sky Radio"" } } } ) { title } }",tvshow,"What is the title of all the cartools that are on the TV Channel with the series name ""Sky Radio""?",Very Long,4,4,9663.0,2249.0
+query { tv_series ( order_by : { rating : asc } ) { episode } },tvshow,List the Episode of all TV series sorted by rating.,Medium,2,2,9663.0,2249.0
+query { tv_series ( order_by : { rating : asc } ) { episode } },tvshow,What are all of the episodes ordered by ratings?,Medium,2,2,9663.0,2249.0
+"query { tv_series ( limit : 3 , order_by : { rating : desc } ) { episode rating } }",tvshow,List top 3 highest Rating  TV series. List the TV series's Episode and Rating.,Very Long,2,2,9663.0,2249.0
+"query { tv_series ( limit : 3 , order_by : { rating : desc } ) { episode rating } }",tvshow,What are 3 most highly rated episodes in the TV series table and what were those ratings?,Very Long,2,2,9663.0,2249.0
+query { tv_series_aggregate { aggregate { max { share } min { share } } } },tvshow,What is minimum and maximum share of TV series?,Short,4,0,9663.0,2249.0
+query { tv_series_aggregate { aggregate { max { share } min { share } } } },tvshow,What is the maximum and minimum share for the TV series?,Medium,4,0,9663.0,2249.0
+"query { tv_series ( where : { episode : { _eq : ""A Love of a Lifetime"" } } ) { air_date } }",tvshow,"What is the air date of TV series with Episode ""A Love of a Lifetime""?",Long,3,3,9663.0,2249.0
+"query { tv_series ( where : { episode : { _eq : ""A Love of a Lifetime"" } } ) { air_date } }",tvshow,"When did the episode ""A Love of a Lifetime"" air?",Medium,3,3,9663.0,2249.0
+"query { tv_series ( where : { episode : { _eq : ""A Love of a Lifetime"" } } ) { weekly_rank } }",tvshow,"What is Weekly Rank of TV series with Episode ""A Love of a Lifetime""?",Long,3,3,9663.0,2249.0
+"query { tv_series ( where : { episode : { _eq : ""A Love of a Lifetime"" } } ) { weekly_rank } }",tvshow,"What is the weekly rank for the episode ""A Love of a Lifetime""?",Long,3,3,9663.0,2249.0
+"query { tv_channel ( where : { tv_series : { episode : { _eq : ""A Love of a Lifetime"" } } } ) { series_name } }",tvshow,"What is the TV Channel of TV series with Episode ""A Love of a Lifetime""? List the TV Channel's series name.",Very Long,4,4,9663.0,2249.0
+"query { tv_channel ( where : { tv_series : { episode : { _eq : ""A Love of a Lifetime"" } } } ) { series_name } }",tvshow,"What is the name of the series that has the episode ""A Love of a Lifetime""?",Long,4,4,9663.0,2249.0
+"query { tv_series ( where : { tv_channel : { series_name : { _eq : ""Sky Radio"" } } } ) { episode } }",tvshow,"List the Episode of all  TV series showed on TV Channel with series name ""Sky Radio"".",Very Long,4,4,9663.0,2249.0
+"query { tv_series ( where : { tv_channel : { series_name : { _eq : ""Sky Radio"" } } } ) { episode } }",tvshow,"What is the episode for the TV series named ""Sky Radio""?",Medium,4,4,9663.0,2249.0
+"query { cartoon ( limit : 1 , order_by : { original_air_date : asc } ) { production_code channel } }",tvshow,Find the production code and channel of the most recently aired cartoon.,Long,2,2,9663.0,2249.0
+"query { cartoon ( limit : 1 , order_by : { original_air_date : asc } ) { production_code channel } }",tvshow,What is the produdction code and channel of the most recent cartoon?,Long,2,2,9663.0,2249.0
+"query { tv_channel ( where : { hight_definition_tv : { _eq : ""yes"" } } ) { package_option series_name } }",tvshow,Find the package choice and series name of the TV channel that has high definition TV.,Very Long,3,3,9663.0,2249.0
+"query { tv_channel ( where : { hight_definition_tv : { _eq : ""yes"" } } ) { package_option series_name } }",tvshow,What are the package options and the name of the series for the TV Channel that supports high definition TV?,Very Long,3,3,9663.0,2249.0
+"query { tv_channel ( where : { cartoons : { written_by : { _eq : ""Todd Casey"" } } } ) { country } }",tvshow,which countries' tv channels are playing some cartoon written by Todd Casey?,Long,4,4,9663.0,2249.0
+"query { tv_channel ( where : { cartoons : { written_by : { _eq : ""Todd Casey"" } } } ) { country } }",tvshow,What are the countries that have cartoons on TV that were written by Todd Casey?,Very Long,4,4,9663.0,2249.0
+"query { tv_channel ( where : { language : { _neq : ""English"" } } ) { pixel_aspect_ratio_par country } }",tvshow,find the pixel aspect ratio and nation of the tv channels that do not use English.,Very Long,3,3,9663.0,2249.0
+"query { tv_channel ( where : { language : { _neq : ""English"" } } ) { pixel_aspect_ratio_par country } }",tvshow,What is the pixel aspect ratio and country of origin for all TV channels that do not use English?,Very Long,3,3,9663.0,2249.0
+query { area_code_state_aggregate { aggregate { count } } },voter_1,How many states are there?,Short,3,0,8725.0,2143.0
+query { contestants ( order_by : { contestant_name : desc } ) { contestant_number contestant_name } },voter_1,"List the contestant numbers and names, ordered by contestant name descending.",Long,2,2,8725.0,2143.0
+query { votes { vote_id phone_number state } },voter_1,"List the vote ids, phone numbers and states of all votes.",Medium,2,0,8725.0,2143.0
+query { area_code_state_aggregate { aggregate { max { area_code } min { area_code } } } },voter_1,What are the maximum and minimum values of area codes?,Medium,4,0,8725.0,2143.0
+"query { votes_aggregate ( where : { state : { _eq : ""CA"" } } ) { aggregate { max { created } } } }",voter_1,What is last date created of votes from the state 'CA'?,Medium,4,3,8725.0,2143.0
+"query { contestants ( where : { contestant_name : { _neq : ""Jessie Alloway"" } } ) { contestant_name } }",voter_1,What are the names of the contestants whose names are not 'Jessie Alloway',Long,3,3,8725.0,2143.0
+"query { votes_aggregate ( where : { _or : [ { state : { _eq : ""NY"" } } , { state : { _eq : ""CA"" } } ] } ) { aggregate { count } } }",voter_1,What are the number of votes from state 'NY' or 'CA'?,Medium,4,4,8725.0,2143.0
+"query { votes ( where : { contestant : { contestant_name : { _eq : ""Tabatha Gehling"" } } } ) { created state phone_number } }",voter_1,"What are the create dates, states, and phone numbers of the votes that were for the contestant named 'Tabatha Gehling'?",Very Long,4,4,8725.0,2143.0
+"query { contestants ( where : { contestant_name : { _like : ""%Al%"" } } ) { contestant_name } }",voter_1,Return the names the contestants whose names contain the substring 'Al'.,Long,3,3,8725.0,2143.0
+query { country ( where : { indepyear : { _gt : 1950 } } ) { name } },world_1,What are the names of all the countries that became independent after 1950?,Long,3,3,10799.0,2481.0
+query { country ( where : { indepyear : { _gt : 1950 } } ) { name } },world_1,Give the names of the nations that were founded after 1950.,Medium,3,3,10799.0,2481.0
+"query { country_aggregate ( where : { governmentform : { _eq : ""Republic"" } } ) { aggregate { count } } }",world_1,How many countries have a republic as their form of government?,Long,3,3,10799.0,2481.0
+"query { country_aggregate ( where : { governmentform : { _eq : ""Republic"" } } ) { aggregate { count } } }",world_1,How many countries have governments that are republics?,Medium,3,3,10799.0,2481.0
+"query { country_aggregate ( where : { region : { _eq : ""Caribbean"" } } ) { aggregate { sum { surfacearea } } } }",world_1,What is the total surface area of the countries in the Caribbean region?,Long,4,3,10799.0,2481.0
+"query { country_aggregate ( where : { region : { _eq : ""Caribbean"" } } ) { aggregate { sum { surfacearea } } } }",world_1,How much surface area do the countires in the Carribean cover together?,Long,4,3,10799.0,2481.0
+"query { country ( where : { name : { _eq : ""Anguilla"" } } ) { continent } }",world_1,Which continent is Anguilla in?,Short,3,3,10799.0,2481.0
+"query { country ( where : { name : { _eq : ""Anguilla"" } } ) { continent } }",world_1,What is the continent name which Anguilla belongs to?,Medium,3,3,10799.0,2481.0
+"query { country ( where : { cities : { name : { _eq : ""Kabul"" } } } ) { region } }",world_1,Which region is the city Kabul located in?,Short,4,4,10799.0,2481.0
+"query { country ( where : { cities : { name : { _eq : ""Kabul"" } } } ) { region } }",world_1,What region is Kabul in?,Short,4,4,10799.0,2481.0
+"query { countrylanguage ( limit : 1 , order_by : { percentage : desc } , where : { country : { name : { _eq : ""Aruba"" } } } ) { language } }",world_1,Which language is the most popular in Aruba?,Short,4,5,10799.0,2481.0
+"query { countrylanguage ( limit : 1 , order_by : { percentage : desc } , where : { country : { name : { _eq : ""Aruba"" } } } ) { language } }",world_1,What language is predominantly spoken in Aruba?,Short,4,5,10799.0,2481.0
+"query { country ( where : { name : { _eq : ""Brazil"" } } ) { population lifeexpectancy } }",world_1,What are the population and life expectancies in Brazil?,Medium,3,3,10799.0,2481.0
+"query { country ( where : { name : { _eq : ""Brazil"" } } ) { population lifeexpectancy } }",world_1,Give me Brazil’s population and life expectancies.,Medium,3,3,10799.0,2481.0
+"query { country ( where : { name : { _eq : ""Angola"" } } ) { population region } }",world_1,What are the region and population of Angola?,Short,3,3,10799.0,2481.0
+"query { country ( where : { name : { _eq : ""Angola"" } } ) { population region } }",world_1,What region does Angola belong to and what is its population?,Medium,3,3,10799.0,2481.0
+"query { country_aggregate ( where : { region : { _eq : ""Central Africa"" } } ) { aggregate { avg { lifeexpectancy } } } }",world_1,What is the average expected life expectancy for countries in the region of Central Africa?,Very Long,4,3,10799.0,2481.0
+"query { country_aggregate ( where : { region : { _eq : ""Central Africa"" } } ) { aggregate { avg { lifeexpectancy } } } }",world_1,How long is the people’s average life expectancy in Central Africa?,Long,4,3,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { lifeexpectancy : asc } , where : { continent : { _eq : ""Asia"" } } ) { name } }",world_1,What is the name of country that has the shortest life expectancy in Asia?,Long,3,4,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { lifeexpectancy : asc } , where : { continent : { _eq : ""Asia"" } } ) { name } }",world_1,Give the name of the country in Asia with the lowest life expectancy.,Long,3,4,10799.0,2481.0
+"query { country_aggregate ( where : { continent : { _eq : ""Asia"" } } ) { aggregate { sum { population } max { gnp } } } }",world_1,What is the total population and maximum GNP in Asia?,Medium,4,3,10799.0,2481.0
+"query { country_aggregate ( where : { continent : { _eq : ""Asia"" } } ) { aggregate { sum { population } max { gnp } } } }",world_1,"How many people live in Asia, and what is the largest GNP among them?",Long,4,3,10799.0,2481.0
+"query { country_aggregate ( where : { _and : { governmentform : { _eq : ""Republic"" } , continent : { _eq : ""Africa"" } } } ) { aggregate { avg { lifeexpectancy } } } }",world_1,What is the average life expectancy in African countries that are republics?,Long,4,4,10799.0,2481.0
+"query { country_aggregate ( where : { _and : { continent : { _eq : ""Africa"" } , governmentform : { _eq : ""Republic"" } } } ) { aggregate { avg { lifeexpectancy } } } }",world_1,Give the average life expectancy for countries in Africa which are republics?,Long,4,4,10799.0,2481.0
+"query { country_aggregate ( where : { _or : [ { continent : { _eq : ""Asia"" } } , { continent : { _eq : ""Europe"" } } ] } ) { aggregate { sum { surfacearea } } } }",world_1,What is the total surface area of the continents Asia and Europe?,Long,4,4,10799.0,2481.0
+"query { country_aggregate ( where : { _or : [ { continent : { _eq : ""Asia"" } } , { continent : { _eq : ""Europe"" } } ] } ) { aggregate { sum { surfacearea } } } }",world_1,Give the total surface area covered by countries in Asia or Europe.,Long,4,4,10799.0,2481.0
+"query { city_aggregate ( where : { district : { _eq : ""Gelderland"" } } ) { aggregate { sum { population } } } }",world_1,How many people live in Gelderland district?,Short,4,3,10799.0,2481.0
+"query { city_aggregate ( where : { district : { _eq : ""Gelderland"" } } ) { aggregate { sum { population } } } }",world_1,What is the total population of Gelderland district?,Medium,4,3,10799.0,2481.0
+"query { country_aggregate ( where : { governmentform : { _eq : ""US Territory"" } } ) { aggregate { avg { gnp } sum { population } } } }",world_1,What is the average GNP and total population in all nations whose government is US territory?,Very Long,4,3,10799.0,2481.0
+"query { country_aggregate ( where : { governmentform : { _eq : ""US Territory"" } } ) { aggregate { avg { gnp } sum { population } } } }",world_1,Give the mean GNP and total population of nations which are considered US territory.,Very Long,4,3,10799.0,2481.0
+query { countrylanguage_aggregate { aggregate { count } } },world_1,How many unique languages are spoken in the world?,Medium,3,0,10799.0,2481.0
+query { countrylanguage_aggregate { aggregate { count } } },world_1,What is the number of distinct languages used around the world?,Long,3,0,10799.0,2481.0
+"query { country_aggregate ( where : { continent : { _eq : ""Africa"" } } ) { aggregate { count } } }",world_1,How many type of governments are in Africa?,Short,3,3,10799.0,2481.0
+"query { country_aggregate ( where : { continent : { _eq : ""Africa"" } } ) { aggregate { count } } }",world_1,How many different forms of governments are there in Africa?,Medium,3,3,10799.0,2481.0
+"query { countrylanguage_aggregate ( where : { country : { name : { _eq : ""Aruba"" } } } ) { aggregate { count } } }",world_1,What is the total number of languages used in Aruba?,Medium,4,4,10799.0,2481.0
+"query { countrylanguage_aggregate ( where : { country : { name : { _eq : ""Aruba"" } } } ) { aggregate { count } } }",world_1,How many languages are spoken in Aruba?,Short,4,4,10799.0,2481.0
+"query { country_aggregate ( where : { _and : { name : { _eq : ""Afghanistan"" } , countrylanguages : { isofficial : { _eq : ""T"" } } } } ) { aggregate { count } } }",world_1,How many official languages does Afghanistan have?,Medium,5,5,10799.0,2481.0
+"query { country_aggregate ( where : { _and : { countrylanguages : { isofficial : { _eq : ""T"" } } , name : { _eq : ""Afghanistan"" } } } ) { aggregate { count } } }",world_1,How many official languages are spoken in Afghanistan?,Medium,5,5,10799.0,2481.0
+"query { country_aggregate ( where : { countrylanguages : { language : { _eq : ""Chinese"" } } } ) { aggregate { count } } }",world_1,What is the number of distinct continents where Chinese is spoken?,Long,4,4,10799.0,2481.0
+"query { country_aggregate ( where : { countrylanguages : { language : { _eq : ""Chinese"" } } } ) { aggregate { count } } }",world_1,How many continents speak Chinese?,Short,4,4,10799.0,2481.0
+"query { country ( where : { _or : [ { countrylanguages : { language : { _eq : ""English"" } } } , { countrylanguages : { language : { _eq : ""Dutch"" } } } ] } , distinct_on : region ) { region } }",world_1,What are the regions that use English or Dutch?,Short,5,5,10799.0,2481.0
+"query { country ( where : { _or : [ { countrylanguages : { language : { _eq : ""English"" } } } , { countrylanguages : { language : { _eq : ""Dutch"" } } } ] } , distinct_on : region ) { region } }",world_1,Which regions speak Dutch or English?,Short,5,5,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { surfacearea : desc } , where : { continent : { _eq : ""Asia"" } } ) { name population lifeexpectancy } }",world_1,"Find the name, population and expected life length of asian country with the largest area?",Very Long,3,4,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { surfacearea : desc } , where : { continent : { _eq : ""Asia"" } } ) { name population lifeexpectancy } }",world_1,"What are the name, population, and life expectancy of the largest Asian country by land?",Very Long,3,4,10799.0,2481.0
+"query { countrylanguage ( where : { _and : { country : { headofstate : { _eq : ""Beatrix"" } } , isofficial : { _eq : ""T"" } } } ) { language } }",world_1,What is the official language spoken in the country whose head of state is Beatrix?,Very Long,5,5,10799.0,2481.0
+"query { countrylanguage ( where : { _and : { country : { headofstate : { _eq : ""Beatrix"" } } , isofficial : { _eq : ""T"" } } } ) { language } }",world_1,What is the official language used in the country the name of whose head of state is Beatrix.,Very Long,5,5,10799.0,2481.0
+"query { countrylanguage_aggregate ( where : { _and : { isofficial : { _eq : ""T"" } , country : { indepyear : { _lt : 1930 } } } } ) { aggregate { count } } }",world_1,What is the total number of unique official languages spoken in the countries that are founded before 1930?,Very Long,5,6,10799.0,2481.0
+"query { countrylanguage_aggregate ( where : { _and : { country : { indepyear : { _lt : 1930 } } , isofficial : { _eq : ""T"" } } } ) { aggregate { count } } }",world_1,"For the countries founded before 1930, what is the total number of distinct official languages?",Very Long,5,6,10799.0,2481.0
+"query { countrylanguage ( where : { language : { _neq : ""English"" } } , distinct_on : countrycode ) { countrycode } }",world_1,What are the country codes of countries where people use languages other than English?,Very Long,3,3,10799.0,2481.0
+"query { countrylanguage ( where : { language : { _neq : ""English"" } } , distinct_on : countrycode ) { countrycode } }",world_1,Give the country codes for countries in which people speak langauges that are not English.,Very Long,3,3,10799.0,2481.0
+"query { city ( where : { _and : { country : { countrylanguages : { isofficial : { _eq : ""T"" } , language : { _eq : ""Chinese"" } } , continent : { _eq : ""Asia"" } } } } , distinct_on : name ) { name } }",world_1,Whic`h unique cities are in  Asian countries where Chinese is the official language?,Very Long,6,6,10799.0,2481.0
+"query { city ( where : { _and : { country : { continent : { _eq : ""Asia"" } , countrylanguages : { isofficial : { _eq : ""T"" } , language : { _eq : ""Chinese"" } } } } } , distinct_on : name ) { name } }",world_1,Return the different names of cities that are in Asia and for which Chinese is the official language.,Very Long,6,6,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { population : asc } ) { name surfacearea indepyear } }",world_1,"What are the name, independence year, and surface area of the country with the smallest population?",Very Long,2,2,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { population : asc } ) { name surfacearea indepyear } }",world_1,"Give the name, year of independence, and surface area of the country that has the lowest population.",Very Long,2,2,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { surfacearea : desc } ) { name population headofstate } }",world_1,"What are the population, name and leader of the country with the largest area?",Very Long,2,2,10799.0,2481.0
+"query { country ( limit : 1 , order_by : { surfacearea : desc } ) { name population headofstate } }",world_1,"Give the name, population, and head of state for the country that has the largest area.",Very Long,2,2,10799.0,2481.0
+"query { country ( limit : 5 , order_by : { surfacearea : desc } ) { name surfacearea } }",world_1,What are the names and areas of countries with the top 5 largest area?,Long,2,2,10799.0,2481.0
+"query { country ( limit : 5 , order_by : { surfacearea : desc } ) { name surfacearea } }",world_1,Return the names and surface areas of the 5 largest countries.,Long,2,2,10799.0,2481.0
+"query { country ( limit : 3 , order_by : { population : desc } ) { name } }",world_1,What are names of countries with the top 3 largest population?,Long,2,2,10799.0,2481.0
+"query { country ( limit : 3 , order_by : { population : desc } ) { name } }",world_1,Return the names of the 3 most populated countries.,Medium,2,2,10799.0,2481.0
+"query { country ( limit : 3 , order_by : { population : asc } ) { name } }",world_1,What are the names of the nations with the 3 lowest populations?,Long,2,2,10799.0,2481.0
+"query { country ( limit : 3 , order_by : { population : asc } ) { name } }",world_1,Return the names of the 3 countries with the fewest people.,Medium,2,2,10799.0,2481.0
+"query { country_aggregate ( where : { continent : { _eq : ""Asia"" } } ) { aggregate { count } } }",world_1,how many countries are in Asia?,Short,3,3,10799.0,2481.0
+"query { country_aggregate ( where : { continent : { _eq : ""Asia"" } } ) { aggregate { count } } }",world_1,Count the number of countries in Asia.,Short,3,3,10799.0,2481.0
+"query { country ( where : { _and : { continent : { _eq : ""Europe"" } , population : { _eq : 80000 } } } ) { name } }",world_1,What are the names of the countries that are in the continent of Europe and have a population of 80000?,Very Long,4,4,10799.0,2481.0
+"query { country ( where : { _and : { continent : { _eq : ""Europe"" } , population : { _eq : 80000 } } } ) { name } }",world_1,Give the names of countries that are in Europe and have a population equal to 80000.,Very Long,4,4,10799.0,2481.0
+"query { country_aggregate ( where : { _and : { continent : { _eq : ""North America"" } , surfacearea : { _gt : 3000.0 } } } ) { aggregate { sum { population } avg { surfacearea } } } }",world_1,What is the total population and average area of countries in the continent of North America whose area is bigger than 3000？,Very Long,4,5,10799.0,2481.0
+"query { country_aggregate ( where : { _and : { continent : { _eq : ""North America"" } , surfacearea : { _gt : 3000.0 } } } ) { aggregate { sum { population } avg { surfacearea } } } }",world_1,Give the total population and average surface area corresponding to countries in Noth America that have a surface area greater than 3000.,Very Long,4,5,10799.0,2481.0
+"query { city ( where : { population : { _gte : 160000 , _lte : 900000 } } ) { name } }",world_1,What are the cities whose population is between 160000 and 900000?,Long,3,3,10799.0,2481.0
+"query { city ( where : { population : { _gte : 160000 , _lte : 90000 } } ) { name } }",world_1,Return the names of cities that have a population between 160000 and 900000.,Long,3,3,10799.0,2481.0
+query { players_aggregate { aggregate { count } } },wta_1,Find the total number of players.,Short,3,0,14974.0,3439.0
+query { players_aggregate { aggregate { count } } },wta_1,How many players are there?,Short,3,0,14974.0,3439.0
+query { matches_aggregate { aggregate { count } } },wta_1,Find the total number of matches.,Short,3,0,14974.0,3439.0
+query { matches_aggregate { aggregate { count } } },wta_1,Count the number of matches.,Short,3,0,14974.0,3439.0
+"query { players ( where : { country_code : { _eq : ""USA"" } } ) { first_name birth_date } }",wta_1,List the first name and birth date of all players from the country with code USA.,Very Long,3,3,14974.0,3439.0
+"query { players ( where : { country_code : { _eq : ""USA"" } } ) { first_name birth_date } }",wta_1,What are the first names and birth dates of players from the USA?,Long,3,3,14974.0,3439.0
+query { matches_aggregate { aggregate { avg { loser_age } avg { winner_age } } } },wta_1,Find the average age of losers and winners of all matches.,Medium,4,0,14974.0,3439.0
+query { matches_aggregate { aggregate { avg { loser_age } avg { winner_age } } } },wta_1,What are the average ages of losers and winners across matches?,Long,4,0,14974.0,3439.0
+query { matches_aggregate { aggregate { avg { winner_rank } } } },wta_1,Find the average rank of winners in all matches.,Medium,4,0,14974.0,3439.0
+query { matches_aggregate { aggregate { avg { winner_rank } } } },wta_1,What is the average rank for winners in all matches?,Medium,4,0,14974.0,3439.0
+query { matches_aggregate { aggregate { min { loser_rank } } } },wta_1,Find the highest rank of losers in all matches.,Short,4,0,14974.0,3439.0
+query { matches_aggregate { aggregate { min { loser_rank } } } },wta_1,What is the best rank of losers across all matches?,Medium,4,0,14974.0,3439.0
+query { players_aggregate { aggregate { count } } },wta_1,find the number of distinct country codes of all players.,Medium,3,0,14974.0,3439.0
+query { players_aggregate { aggregate { count } } },wta_1,How many distinct countries do players come from?,Medium,3,0,14974.0,3439.0
+query { matches_aggregate { aggregate { count } } },wta_1,Find the number of distinct name of losers.,Short,3,0,14974.0,3439.0
+query { matches_aggregate { aggregate { count } } },wta_1,How many different loser names are there?,Short,3,0,14974.0,3439.0
+"query { matches_aggregate ( where : { _or : [ { year : { _eq : 2013 } } , { year : { _eq : 2016 } } ] } ) { aggregate { count } } }",wta_1,List the number of all matches who played in years of 2013 or 2016.,Long,4,4,14974.0,3439.0
+"query { matches_aggregate ( where : { _or : [ { year : { _eq : 2013 } } , { year : { _eq : 2016 } } ] } ) { aggregate { count } } }",wta_1,How many matches were played in 2013 or 2016?,Short,4,4,14974.0,3439.0
+"query { players ( limit : 1 , order_by : { birth_date : asc } ) { first_name country_code } }",wta_1,Find the first name and country code of the oldest player.,Medium,2,2,14974.0,3439.0
+"query { players ( limit : 1 , order_by : { birth_date : asc } ) { first_name country_code } }",wta_1,What is the first name and country code of the oldest player?,Medium,2,2,14974.0,3439.0
+query { players ( order_by : { birth_date : asc } ) { first_name last_name } },wta_1,List the first and last name of all players in the order of birth date.,Long,2,2,14974.0,3439.0
+query { players ( order_by : { birth_date : asc } ) { first_name last_name } },wta_1,"What are the full names of all players, sorted by birth date?",Medium,2,2,14974.0,3439.0
+"query { players ( order_by : { birth_date : asc } , where : { hand : { _eq : ""L"" } } ) { first_name last_name } }",wta_1,List the first and last name of all players who are left / L hand in the order of birth date.,Very Long,3,4,14974.0,3439.0
+"query { players ( order_by : { birth_date : asc } , where : { hand : { _eq : ""L"" } } ) { first_name last_name } }",wta_1,"What are the full names of all left handed players, in order of birth date?",Long,3,4,14974.0,3439.0
+"query { rankings ( limit : 1 , order_by : { tours : desc_nulls_last } ) { player { country_code first_name } } }",wta_1,Find the first name and country code of the player who did the most number of tours.,Very Long,3,2,14974.0,3439.0
+"query { rankings ( limit : 1 , order_by : { tours : desc_nulls_last } ) { player { country_code first_name } } }",wta_1,What is the first name and country code of the player with the most tours?,Long,3,2,14974.0,3439.0
+"query { matches ( limit : 1 , order_by : { winner_rank_points : desc } , where : { tourney_name : { _eq : ""Australian Open"" } } ) { winner_name } }",wta_1,Find the name of the winner who has the highest rank points and participated in the Australian Open tourney.,Very Long,3,4,14974.0,3439.0
+"query { matches ( limit : 1 , order_by : { winner_rank_points : desc } , where : { tourney_name : { _eq : ""Australian Open"" } } ) { winner_name } }",wta_1,What is the name of the winner with the most rank points who participated in the Australian Open tournament?,Very Long,3,4,14974.0,3439.0
+"query { matches ( limit : 1 , order_by : { minutes : desc } ) { winner_name loser_name } }",wta_1,find the names of loser and winner who played in the match with greatest number of minutes.,Very Long,2,2,14974.0,3439.0
+"query { matches ( limit : 1 , order_by : { minutes : desc } ) { winner_name loser_name } }",wta_1,What are the names of the winner and loser who played in the longest match?,Long,2,2,14974.0,3439.0
+"query { matches_aggregate ( where : { _and : { winner_hand : { _eq : ""L"" } , tourney_name : { _eq : ""WTA Championships"" } } } ) { aggregate { count } } }",wta_1,How many different winners both participated in the WTA Championships and were left handed?,Very Long,4,4,14974.0,3439.0
+"query { matches_aggregate ( where : { _and : { winner_hand : { _eq : ""L"" } , tourney_name : { _eq : ""WTA Championships"" } } } ) { aggregate { count } } }",wta_1,Find the number of left handed winners who participated in the WTA Championships.,Very Long,4,4,14974.0,3439.0
