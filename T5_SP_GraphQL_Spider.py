@@ -849,20 +849,17 @@ system.tokenizer.decode(inputs['source_ids'])
 # # maybe i didn't need attention_mask? or the padding was breaking something.
 # # attention mask is only needed  
 
-if(use_gpu == True):
-  system.model = system.model.cuda()
-else:
-  system.model = system.model.cpu()
-generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
-# # # summary_text = system.tokenizer.decode(generated_ids[0])
+# if(use_gpu == True):
+#   system.model = system.model.cuda()
+# else:
+#   system.model = system.model.cpu()
+# generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
+# # # # summary_text = system.tokenizer.decode(generated_ids[0])
 
-hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+# hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
 
 # In[ ]:
-
-print("hyps")
-print(hyps)
 
 
 # improving the network: 
@@ -901,8 +898,6 @@ print(hyps)
 
 
 
-
-
 # In[ ]:
 
 
@@ -920,7 +915,7 @@ print(hyps)
 final_finetuning = False
 
 if(final_finetuning == True):
-  print("we're down here")
+  print("we start finetuning the model for the last time")
   if os.path.exists('final_training_model_weights.pth'):
       # Load the model weights if the file exists
     print("Model is allready fine-tuned for the final time, loading weights...")
@@ -938,114 +933,3 @@ if(final_finetuning == True):
     system.task='finetune'
     trainer.fit(system)
     torch.save(system.state_dict(), 'final_training_model_weights.pth')
-
-
-# # Test
-
-
-
-# In[ ]:
-
-# if __name__ == '__main__':
-#     # Your main code goes here, e.g.:
-#     system.test_flag = 'sql'
-#     system.prepare_data()
-#     trainer = Trainer(max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-#     trainer.test(system, verbose=True)
-
-
-# In[ ]:
-
-
-
-
-# system.num_beams = 3
-# system.test_flag = 'sql'
-# system.prepare_data()
-# trainer.test()
-
-
-# In[ ]:
-
-
-# import nltk
-# nltk.download('punkt')
-
-
-# In[ ]:
-
-
-# !cd spider && git clone https://github.com/taoyds/spider
-
-
-# In[ ]:
-
-
-# !cd spider && python ./spider/evaluation.py --gold dev_gold.sql --pred ../test_predictions.txt --etype match --db ./database --table tables.json
-
-
-
-# # Inference server
-
-# In[ ]:
-
-
-# !pip install flask-ngrok
-
-
-# In[ ]:
-
-
-# pip install -U flask-cors
-
-
-# In[ ]:
-
-
-# from flask_ngrok import run_with_ngrok
-# from flask import Flask, jsonify, request, make_response
-# from flask_cors import CORS
-# app = Flask(__name__)
-# CORS(app)
-# run_with_ngrok(app)   #starts ngrok when the app is run
-
-def predict(prompt, schemaId):
-
-    if system.train_dataset_g.name_to_schema[schemaId] is not None:
-        input_string = system.train_dataset_g.get_question_with_schema(prompt, schemaId)
-    elif system.dev_dataset.name_to_schema[schemaId] is not None:
-        input_string = system.val_dataset_g.get_question_with_schema(prompt, schemaId)
-    print(input_string)
-
-    inputs = system.tokenizer.batch_encode_plus([input_string], max_length=1024, return_tensors='pt')['input_ids']
-    print(inputs.shape)
-
-    if(use_gpu == True):
-      generated_ids = system.model.generate(inputs.cuda(), num_beams=3, repetition_penalty=1.0, max_length=1000, early_stopping=True)
-    else:
-      generated_ids = system.model.generate(inputs, num_beams=3, repetition_penalty=1.0, max_length=1000, early_stopping=True)
-    hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
-    dict_res = {"prediction": hyps[0]}
-    return dict_res
-
-# Hardcode your data
-hardcoded_schemaId = "battle_death"
-hardcoded_prompt = "How many ships ended up being 'Destroyed'?"
-result = predict(hardcoded_prompt, hardcoded_schemaId)
-print("this is the result")
-print(result)
-
-
-
-## Evaluation
-
-
-
-
-
-
-# In[ ]:
-
-
-
-
