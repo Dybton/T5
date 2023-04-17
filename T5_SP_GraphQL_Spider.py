@@ -103,8 +103,6 @@ from functools import reduce
 # logging.basicConfig(level=logging.INFO)
 
 
-
-
 # In[32]:
 
 
@@ -122,14 +120,6 @@ test_state = False
 tensorflow_active = False
 use_gpu = True
 
-hostname = socket.gethostname()
-print("hostname " + hostname)
-
-# if hostname == "Jakobs-MBP":
-#     use_gpu = False
-#     print("we are one a mac so we're using a cpu")
-# else:
-#     print("we are on the cluster so we are using the gpu")
 
 
 # # # Prepare GraphQL Dataset
@@ -778,7 +768,10 @@ logger = TensorBoardLogger("lightning_logs/")
 # Pass the logger to the Trainer
 trainer = pl.Trainer(logger=logger)
 
-
+if (use_gpu):
+  trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
+else:
+  trainer = Trainer(max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2)
 
 if os.path.exists('model_weights.pth'):
     # Load the model weights if the file exists
@@ -787,10 +780,6 @@ if os.path.exists('model_weights.pth'):
 else:
     # If the weights file doesn't exist, train the model and save the weights after training
     print("lets train this model!")
-    if (use_gpu):
-      trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
-    else:
-      trainer = Trainer(max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2)
     trainer.fit(system)
     torch.save(system.state_dict(), 'model_weights.pth')
 
@@ -849,17 +838,20 @@ system.tokenizer.decode(inputs['source_ids'])
 # # maybe i didn't need attention_mask? or the padding was breaking something.
 # # attention mask is only needed  
 
-# if(use_gpu == True):
-#   system.model = system.model.cuda()
-# else:
-#   system.model = system.model.cpu()
-# generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
-# # # # summary_text = system.tokenizer.decode(generated_ids[0])
+if(use_gpu == True):
+  system.model = system.model.cuda()
+else:
+  system.model = system.model.cpu()
+generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
+# # # summary_text = system.tokenizer.decode(generated_ids[0])
 
-# hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
 
 # In[ ]:
+
+print("hyps")
+print(hyps)
 
 
 # improving the network: 
@@ -912,10 +904,10 @@ system.tokenizer.decode(inputs['source_ids'])
 
 # In[ ]:
 
-final_finetuning = True
+final_finetuning = False
 
 if(final_finetuning == True):
-  print("we start finetuning the model for the last time")
+  print("we start the final fine-tuning")
   if os.path.exists('final_training_model_weights.pth'):
       # Load the model weights if the file exists
     print("Model is allready fine-tuned for the final time, loading weights...")
