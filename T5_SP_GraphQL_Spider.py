@@ -787,9 +787,10 @@ system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_sp
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
+system.model.cuda()
+
 system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
 
-system.model.cuda()
 
 # Fine Tuning
 system.task = 'finetune'
