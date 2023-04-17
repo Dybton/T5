@@ -118,7 +118,6 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-use_gpu = True
 
 
 
@@ -768,10 +767,8 @@ logger = TensorBoardLogger("lightning_logs/")
 # Pass the logger to the Trainer
 trainer = pl.Trainer(logger=logger)
 
-if (use_gpu):
-  trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
-else:
-  trainer = Trainer(max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2)
+
+trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
 if os.path.exists('model_weights.pth'):
     # Load the model weights if the file exists
@@ -790,10 +787,9 @@ system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_sp
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
-if(use_gpu):
-  system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
-else:
-  system.tokenizer.decode(system.model.generate(input_ids)[0])
+system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
+
+system.model.cuda()
 
 # Fine Tuning
 system.task = 'finetune'
@@ -810,10 +806,7 @@ if os.path.exists('fine_tuned_model_weights.pth'):
 
 else:
   print("Let's fine-tune this model!")
-  if(use_gpu):
-    trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
-  else:
-    trainer = Trainer(max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
+  trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
   trainer.fit(system)
   torch.save(system.state_dict(), 'fine_tuned_model_weights.pth')
   
@@ -838,10 +831,7 @@ system.tokenizer.decode(inputs['source_ids'])
 # # maybe i didn't need attention_mask? or the padding was breaking something.
 # # attention mask is only needed  
 
-if(use_gpu == True):
-  system.model = system.model.cuda()
-else:
-  system.model = system.model.cpu()
+system.model = system.model.cuda()
 generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
 # # # summary_text = system.tokenizer.decode(generated_ids[0])
 
@@ -918,10 +908,7 @@ if(final_finetuning == True):
     #system = system.load_from_checkpoint('fine_tuned_model_weights.pth', hyperparams=hyperparams) # he refers to checkpoints. What are those?
     system.load_state_dict(torch.load('fine_tuned_model_weights.pth'))
 
-    if(use_gpu):
-      trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-    else:
-      trainer = Trainer(max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
+    trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
     system.task='finetune'
     trainer.fit(system)
     torch.save(system.state_dict(), 'final_training_model_weights.pth')
