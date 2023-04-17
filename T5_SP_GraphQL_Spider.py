@@ -904,7 +904,7 @@ print(hyps)
 
 # In[ ]:
 
-final_finetuning = False
+final_finetuning = True
 
 if(final_finetuning == True):
   print("we start the final fine-tuning")
