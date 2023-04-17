@@ -125,11 +125,11 @@ use_gpu = True
 hostname = socket.gethostname()
 print("hostname " + hostname)
 
-if hostname == "Jakobs-MBP":
-    use_gpu = False
-    print("we are one a mac so we're using a cpu")
-else:
-    print("we are on the cluster so we are using the gpu")
+# if hostname == "Jakobs-MBP":
+#     use_gpu = False
+#     print("we are one a mac so we're using a cpu")
+# else:
+#     print("we are on the cluster so we are using the gpu")
 
 
 # # # Prepare GraphQL Dataset
@@ -912,7 +912,7 @@ system.tokenizer.decode(inputs['source_ids'])
 
 # In[ ]:
 
-final_finetuning = False
+final_finetuning = True
 
 if(final_finetuning == True):
   print("we start finetuning the model for the last time")
