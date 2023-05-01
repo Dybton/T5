@@ -711,7 +711,7 @@ system.tokenizer.decode(inputs['source_ids'])
 # # attention mask is only needed  
 
 system.model = system.model.cuda()
-generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
+generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
 # # # summary_text = system.tokenizer.decode(generated_ids[0])
 
 hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
