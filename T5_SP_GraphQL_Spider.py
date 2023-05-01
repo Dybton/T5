@@ -1,65 +1,10 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # Downloads, installs & imports
-
-# SPEGQL Schemas and datasets download and unzip
-# 
-
-# In[26]:
-
-
-# %%capture
-# !gdown https://drive.google.com/uc?id=1H026ff-czIdLH3saJzbWUH8VKOW3j63X
-# !unzip SPEGQL-dataset.zip
-
-
-# Spider datasets download
-
-# In[27]:
-
-
-# %%capture
-# !gdown https://drive.google.com/uc?id=14x6lsWqlu6gR-aYxa6cemslDN3qT3zxP
-# !unzip cosql_dataset.zip
-
-
-# In[28]:
-
-
-# %%capture
-# !gdown https://drive.google.com/uc?id=11icoH_EA-NYb0OrPTdehRWm_d7-DIzWX
-# !unzip spider.zip
-
-
-# Installs
-
-# In[52]:
-
-
-# %%capture
-# !pip install --upgrade jsonschema
-# !pip3 install graphql-core --log ./logs.txt
-# !pip3 install git+https://github.com/acarrera94/text-to-graphql-validation --no-deps --log ./logs.txt
-
-
-# In[30]:
-
-
-#!git clone https://github.com/huggingface/transformers
-#!pip install transformers==4.15.0
-
 import transformers
 print("my version of transformers is " + transformers.__version__)
-
-# !pip install torch==1.10.0
-# !pip install pytorch-lightning 2.0.0
 
 
 # In[31]:
 import numpy as np
 import pandas as pd
-# # # from tqdm import tqdm
 import torch
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler, ConcatDataset
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -87,7 +32,6 @@ from os.path import basename
 import re
 from functools import reduce
 
-# #from graphqlval import exact_match
 import itertools
 
 torch.manual_seed(0)
@@ -97,13 +41,6 @@ from pathlib import Path
 from os.path import basename
 import glob
 from functools import reduce
-
-# OPTIONAL: if you want to have more information on what's happening under the hood, activate the logger as follows
-# import logging
-# logging.basicConfig(level=logging.INFO)
-
-
-# In[32]:
 
 
 print("my version of pl is " + pl.__version__)
@@ -118,13 +55,6 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-
-
-
-# # # Prepare GraphQL Dataset
-
-# # In[33]:
-
 
 class TextToGraphQLDataset(Dataset):
   'Characterizes a dataset for PyTorch'
@@ -193,8 +123,6 @@ class TextToGraphQLDataset(Dataset):
                 }
 
 
-# # In[34]:
-
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
     dataset = TextToGraphQLDataset(tokenizer=tokenizer, type_path='train.json', block_size=102)
@@ -202,15 +130,6 @@ if test_state:
     length = dataset.__len__()
     item = dataset.__getitem__(0)
     print("TextToGraphQLDataset test done")
-
-
-# So far:
-# - the max length of a tokenized question is **49**
-# - the max length of a tokenized query is **102**
-# 
-# 
-
-# # In[35]:
 
 
 class MaskGraphQLDataset(Dataset):
@@ -274,12 +193,6 @@ if test_state:
 
     dataset = MaskGraphQLDataset(tokenizer=tokenizer, type_path='train.json', block_size=64)
     print("MaskGraphQLDataset test done")
-
-
-# # # Prepare Spider Dataset
-
-# # In[37]:
-
 
 class SpiderDataset(Dataset):
   'Characterizes a dataset for PyTorch'
@@ -362,8 +275,6 @@ class SpiderDataset(Dataset):
                 'target_ids_y': target_ids}
 
 
-# # In[38]:
-
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
     dataset = SpiderDataset(tokenizer=tokenizer , type_path='train_spider.json', block_size=102)
@@ -371,10 +282,6 @@ if test_state:
     length = dataset.__len__()
     item = dataset.__getitem__(0)
     print("SpiderDataset test done")
-
-
-# # In[39]:
-
 
 class CoSQLMaskDataset(Dataset):
   'Characterizes a dataset for PyTorch'
@@ -417,7 +324,7 @@ class CoSQLMaskDataset(Dataset):
                 # repeated_utterance[pos][pos] = target_token # so that the next iteration the previous token is correct
 
                 
-          
+
 
   def __len__(self):
         'Denotes the total number of samples'
@@ -433,9 +340,6 @@ class CoSQLMaskDataset(Dataset):
                 # 'source_mask': src_mask,
                 # 'target_ids': target_ids,
                 # 'target_ids_y': target_ids}
-
-
-# In[40]:
 
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
@@ -456,8 +360,6 @@ if test_state:
 
 
 # # # Model
-
-# # In[41]:
 
 
 class T5MultiSPModel(pl.LightningModule):
@@ -733,30 +635,13 @@ if tensorflow_active:
 
 
 
-
-# # # Pre-training
-
-# # In[43]:
-
-
-# # tokenizer = BartTokenizer.from_pretrained('bart-large')
-# # dataset = ConvDataset(tokenizer)
-
-
-# # In[44]:
-
-
 import argparse
 from pytorch_lightning.loggers import TensorBoardLogger
 import pytorch_lightning as pl
 
-# # In[45]:
 
 
 hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
-
-
-# # In[46]:
 
 # # system = ConvBartSystem(dataset, train_sampler, batch_size=2)
 system = T5MultiSPModel(hyperparams,batch_size=32)
@@ -766,7 +651,6 @@ print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 logger = TensorBoardLogger("lightning_logs/")
 # Pass the logger to the Trainer
 trainer = pl.Trainer(logger=logger)
-
 
 trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
@@ -814,17 +698,11 @@ else:
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 
-# In[ ]:
-
 
 inputs = system.val_dataset[0]
 system.tokenizer.decode(inputs['source_ids'])
 
 # # system.tokenizer.decode(inputs['target_ids'])
-
-
-# In[ ]:
-
 
 
 # # inputs = system.tokenizer.batch_encode_plus([user_input], max_length=1024, return_tensors='pt')
@@ -838,62 +716,8 @@ generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0), num_bea
 
 hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
-
-# In[ ]:
-
 print("hyps")
 print(hyps)
-
-
-# improving the network: 
-# - can it handle <, > ? any other missing could check the dataset directy for unk
-# - try to increase the learning rate an order of magnitude.
-
-# In[ ]:
-
-
-# trainer.save_checkpoint('finished.ckpt')
-
-
-# In[ ]:
-
-
-# !zip -r finished_train.zip finished.ckpt
-
-
-# The cells below is used to load a checkpoint instead of training.
-
-# In[ ]:
-
-
-# from google.colab import drive
-# drive.mount('/content/gdrive')
-
-
-# In[ ]:
-
-
-# from google.colab import drive
-# drive.flush_and_unmount()
-
-
-# In[ ]:
-
-
-
-# In[ ]:
-
-
-# !cp ./drive/My\ Drive/ssh_files/finished_train.zip ./finished_train.zip
-
-
-# In[ ]:
-
-
-# !unzip ./finished_train.zip
-
-
-# In[ ]:
 
 final_finetuning = True
 
