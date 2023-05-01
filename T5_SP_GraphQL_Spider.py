@@ -683,6 +683,8 @@ system.batch_size = 2 # because t5-base is smaller than bart.
 system.hyperparams
 system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
 
+system.prepare_data() # might not be needed. 
+
 if os.path.exists('fine_tuned_model_weights.pth'):
     # Load the model weights if the file exists
   print("Model is allready fine-tuned, loading weights...")
@@ -737,3 +739,10 @@ if(final_finetuning == True):
     system.task='finetune'
     trainer.fit(system)
     torch.save(system.state_dict(), 'final_training_model_weights.pth')
+
+
+
+system.num_beams = 3
+system.test_flag = 'graphql'
+system.prepare_data()
+trainer.test(model=system)
