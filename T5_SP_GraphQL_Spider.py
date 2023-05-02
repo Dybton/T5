@@ -422,12 +422,12 @@ class T5MultiSPModel(pl.LightningModule):
     
 
   def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None, on_tpu=False, using_native_amp=False, using_lbfgs=False):
-    if on_tpu or self.trainer.use_tpu:
-        xm.optimizer_step(optimizer)
-    else:
-        optimizer.step()
-    optimizer.zero_grad()
-    self.lr_scheduler.step()
+      if on_tpu or self.trainer.accelerator_connector.use_tpu:
+          xm.optimizer_step(optimizer)
+      else:
+          optimizer.step()
+      optimizer.zero_grad()
+      self.lr_scheduler.step()
 
 
 
