@@ -12,6 +12,7 @@ source /home/jato/venv/bin/activate
 
 nvidia-smi
 
-python T5_SP_GraphQL_Spider.py
+python t5_sp_graphql_spider_unedited.py
+
 
 deactivate
