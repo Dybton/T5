@@ -222,12 +222,12 @@ class SpiderDataset(Dataset):
               columns_names = " ".join([column_name[1] for column_name in group ])
               tables_with_columns += '<t> ' + db_tables[table_id] + ' <c> ' + columns_names + ' </c> ' + '</t> '
 
-            db_with_question = 'translate English to SQL: ' + element['question'] + ' ' + tables_with_columns
+            db_with_question = 'translate English to SQL: ' + element['question'] + ' ' + tables_with_columns + '</s>'
+            tokenized_s = tokenizer.batch_encode_plus([db_with_question],max_length=1024, pad_to_max_length=True, truncation=True,return_tensors='pt')
 
-            tokenized_s = tokenizer.encode_plus(db_with_question, max_length=1024, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.encode_plus(element['query'], max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
+            tokenized_t = tokenizer.batch_encode_plus([element['query'] + ' </s>'],max_length=block_size, pad_to_max_length=True, truncation=True,return_tensors='pt')
             self.target.append(tokenized_t)
 
   def __len__(self):
