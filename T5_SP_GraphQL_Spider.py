@@ -529,23 +529,22 @@ class T5MultiSPModel(pl.LightningModule):
   # def test_end(self, outputs):
   #   return self.validation_end(outputs)
 
-
   def test_epoch_end(self, outputs):
     avg_loss = torch.stack([x["test_loss"] for x in outputs]).mean()
-    
+    self.log("avg_test_loss", avg_loss, prog_bar=True)
+
     if self.test_flag == 'graphql':
-      avg_acc = torch.stack([x["test_accuracy"] for x in outputs]).mean()
-      tensorboard_logs = {"test_loss": avg_loss, "test_acc": avg_acc}
-      return {"progress_bar": tensorboard_logs, "log": tensorboard_logs}
+        avg_accuracy = torch.stack([x["test_accuracy"] for x in outputs if "test_accuracy" in x]).mean()
+        self.log("avg_test_accuracy", avg_accuracy, prog_bar=True)
+        return {"avg_test_loss": avg_loss, "avg_test_accuracy": avg_accuracy}
 
     else:
-      output_test_predictions_file = os.path.join(os.getcwd(), "test_predictions.txt")
-      with open(output_test_predictions_file, "w+") as p_writer:
-          for output_batch in outputs:
-              p_writer.writelines(s + "\n" for s in output_batch["preds"])
-          p_writer.close()
-      tensorboard_logs = {"test_loss": avg_loss}
-      return {"progress_bar": tensorboard_logs, "log": tensorboard_logs}
+        output_test_predictions_file = os.path.join(os.getcwd(), "test_predictions.txt")
+        with open(output_test_predictions_file, "w+") as p_writer:
+            for output_batch in outputs:
+                p_writer.writelines(s + "\n" for s in output_batch["preds"])
+            p_writer.close()
+        return {"avg_test_loss": avg_loss}
 
   def prepare_data(self):
     if self.task == 'finetune':
