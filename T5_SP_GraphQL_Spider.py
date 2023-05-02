@@ -421,13 +421,14 @@ class T5MultiSPModel(pl.LightningModule):
     return {'progress_bar': tensorboard_logs, 'log': tensorboard_logs }
     
 
-  def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None):
-    if self.trainer.use_tpu:
-      xm.optimizer_step(optimizer)
+  def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None, on_tpu=False):
+    if on_tpu or self.trainer.use_tpu:
+        xm.optimizer_step(optimizer)
     else:
-      optimizer.step()
+        optimizer.step()
     optimizer.zero_grad()
     self.lr_scheduler.step()
+
 
 
   def configure_optimizers(self):
@@ -532,14 +533,31 @@ class T5MultiSPModel(pl.LightningModule):
       self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
+  @staticmethod
+  def custom_collate_fn(batch):
+    keys = batch[0].keys()
+    collated_batch = {}
+
+    for key in keys:
+        if key in ['source_ids', 'target_ids']:
+            max_length = max([len(sample[key]) for sample in batch])
+            padded_tensors = [torch.cat([sample[key], torch.zeros(max_length - len(sample[key]), dtype=torch.long)], dim=0) for sample in batch]
+            collated_batch[key] = torch.stack(padded_tensors, dim=0)
+        else:
+            max_length = max([len(sample[key]) for sample in batch])
+            padded_tensors = [torch.cat([sample[key], torch.zeros(max_length - len(sample[key]), dtype=torch.long)], dim=0) for sample in batch]
+            collated_batch[key] = torch.stack(padded_tensors, dim=0)
+
+    return collated_batch
+
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=0)
 
   def val_dataloader(self):
-    return DataLoader(self.val_dataset, batch_size=self.batch_size)
+    return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=0)
 
   def test_dataloader(self):
-    return DataLoader(self.test_dataset, batch_size=self.batch_size)
+    return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=0)
 
 
 
