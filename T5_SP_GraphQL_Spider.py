@@ -613,7 +613,7 @@ system.prepare_data() # might not be needed.
 best_initial_training_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt", hyperparams=hyperparams)
 
 ### Testing the model
-system.tokenizer.decode(best_initial_training_model.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
+system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = best_initial_training_model.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
