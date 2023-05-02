@@ -6,6 +6,8 @@ print("my version of transformers is " + transformers.__version__)
 import numpy as np
 import pandas as pd
 import torch
+print("torch.cuda.is_available()")
+print(torch.cuda.is_available())
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler, ConcatDataset
 from torch.utils.data.sampler import SubsetRandomSampler
 from torch.optim import Adam
