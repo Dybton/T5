@@ -78,7 +78,6 @@ class TextToGraphQLDataset(Dataset):
         self.name_to_schema = {}
         for schema_path in schemas:
            with open(schema_path, 'r', encoding='utf-8') as s:
-            
              data = json.load(s)
 
              type_field_tokens = [ ['<t>'] + [t['name']] + ['{'] + [ f['name'] for f in t['fields']] + ['}'] + ['</t>'] for t in data['types']]
@@ -97,15 +96,15 @@ class TextToGraphQLDataset(Dataset):
 
           for element in data:
             question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']]) + ' </s>'
-            tokenized_s = tokenizer.encode_plus(question_with_schema, max_length=1024, pad_to_max_length=True, truncation=True, return_tensors='pt')
+            tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.encode_plus(element['query'] + ' </s>', max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
+            tokenized_t = tokenizer.encode_plus(element['query'] + ' </s>',max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.target.append(tokenized_t)
             self.schema_ids.append(element['schemaId'])
 
   def get_question_with_schema(self, question, schemaId):
-        return 'translate English to GraphQL: ' + question  + ' ' + ' '.join(self.name_to_schema[schemaId])
+        return 'translate English to GraphQL: ' + question  + ' ' + ' '.join(self.name_to_schema[schemaId]) + ' </s>'
 
   def __len__(self):
         'Denotes the total number of samples'
