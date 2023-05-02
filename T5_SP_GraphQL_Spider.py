@@ -512,13 +512,18 @@ class T5MultiSPModel(pl.LightningModule):
     ]
     return (preds, target)
 
+  def exact_match_accuracy(preds, target):
+    total = len(preds)
+    correct = sum([1 for pred, tgt in zip(preds, target) if pred == tgt])
+    return correct / total
+
   def test_step(self, batch, batch_idx):
     preds, target = self._generate_step(batch)
     loss = self._step(batch)
     if self.test_flag == 'graphql':
-      accuracy = exact_match.exact_match_accuracy(preds,target)
+      accuracy = exact_match_accuracy(preds, target)
       return {"test_loss": loss, "test_accuracy": torch.tensor(accuracy)}
-    else: 
+    else:
       return {"test_loss": loss, "preds": preds, "target": target }
 
   # def test_end(self, outputs):
