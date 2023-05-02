@@ -320,7 +320,7 @@ if test_state:
 
 class T5MultiSPModel(pl.LightningModule):
   # def __init__(self, train_sampler=None, tokenizer= None, dataset=None, batch_size = 2):
-  def __init__(self, hparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2,temperature=1.0,top_k=50, top_p=1.0, num_beams=1 ):
+  def __init__(self, hyperparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2,temperature=1.0,top_k=50, top_p=1.0, num_beams=1 ):
     super(T5MultiSPModel, self).__init__()
 
     self.temperature = temperature
@@ -329,7 +329,7 @@ class T5MultiSPModel(pl.LightningModule):
     self.num_beams = num_beams
 
     # self.lr=3e-5
-    self.hparams = hparams
+    self.hyperparams = hyperparams
 
     self.task = task
     self.test_flag = test_flag
@@ -442,7 +442,7 @@ class T5MultiSPModel(pl.LightningModule):
         },
         {"params": [p for n, p in self.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
     ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=self.hparams.lr, eps=1e-8)
+    optimizer = AdamW(optimizer_grouped_parameters, lr=self.hyperparams.lr, eps=1e-8)
     scheduler = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=0, num_training_steps=t_total
     )
