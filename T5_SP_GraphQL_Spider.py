@@ -512,7 +512,7 @@ class T5MultiSPModel(pl.LightningModule):
     ]
     return (preds, target)
 
-  def exact_match_accuracy(preds, target):
+  def exact_match_accuracy(self, preds, target):
     total = len(preds)
     correct = sum([1 for pred, tgt in zip(preds, target) if pred == tgt])
     return correct / total
