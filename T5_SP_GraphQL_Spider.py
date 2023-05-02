@@ -336,7 +336,7 @@ class T5MultiSPModel(pl.LightningModule):
     if self.task == 'finetune':
       self.model = T5ForConditionalGeneration.from_pretrained('t5-base')
     else:
-      self.model = T5ForConditionalGeneration.from_pretrained('t5-base-output-past')
+      self.model = T5ForConditionalGeneration.from_pretrained('t5-base')
 
     self.tokenizer = T5TokenizerFast.from_pretrained('t5-base')
 
