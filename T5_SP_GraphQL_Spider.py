@@ -371,6 +371,7 @@ class T5MultiSPModel(pl.LightningModule):
       # labels need to have pad_token ignored manually by setting to -100
       # todo check the ignore token for forward
       # seems like decoder_input_ids can be removed. 
+      print(f'_step called, input_ids: {source_ids}, labels: {labels}')
       outputs = self(source_ids, attention_mask=source_mask, labels=labels,)
 
       loss = outputs[0]
@@ -379,6 +380,7 @@ class T5MultiSPModel(pl.LightningModule):
       y = batch['target_id']
       labels = y[:, :].clone()
       labels[y[:, :] == self.tokenizer.pad_token_id] = -100
+      print(f'_step called, input_ids: {batch["source_ids"]}, labels: {labels}')
       loss = self(
           input_ids=batch["source_ids"],
           labels=labels
@@ -389,6 +391,7 @@ class T5MultiSPModel(pl.LightningModule):
 
   def training_step(self, batch, batch_idx):
     loss = self._step(batch)
+    print(f'Training step called, batch_idx: {batch_idx}, loss: {loss.item()}')
 
     tensorboard_logs = {"train_loss": loss}
     return {"loss": loss, "log": tensorboard_logs}
@@ -415,6 +418,14 @@ class T5MultiSPModel(pl.LightningModule):
     tensorboard_logs = {"val_loss": avg_loss}
     print("the avg loss is " + str(avg_loss))
     return {'progress_bar': tensorboard_logs, 'log': tensorboard_logs }
+
+
+    # Added this because loss = nan for epoch after first training step. Adding this to do errror checking.
+    def on_after_backward(self):
+      for name, param in self.named_parameters():
+          if param.grad is not None:
+              if torch.isnan(param.grad).any():
+                  print(f'Gradient NaN found in {name}')
     
 
   def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None, on_tpu=False, using_native_amp=False, using_lbfgs=False):
@@ -424,8 +435,6 @@ class T5MultiSPModel(pl.LightningModule):
           optimizer.step()
       optimizer.zero_grad()
       self.lr_scheduler.step()
-
-
 
   def configure_optimizers(self):
     t_total = len(self.train_dataloader()) * self.trainer.max_epochs * self.trainer.limit_train_batches
