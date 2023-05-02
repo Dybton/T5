@@ -591,7 +591,7 @@ script_dir = os.path.dirname(os.path.realpath(__file__))
 # Create a ModelCheckpoint callback
 checkpoint_callback = ModelCheckpoint(
     monitor='val_loss',
-    dirpath='checkpoints',
+    dirpath=os.path.join(script_dir, 'checkpoints'),
     filename='model-{epoch:02d}-{val_loss:.2f}',
     save_top_k=1,
     mode='min',
@@ -609,7 +609,7 @@ trainer.save_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt")
 system.prepare_data() # might not be needed.
 
 # Load the best initial training model for testing
-best_initial_training_model = T5MultiSPModel.load_from_checkpoint(checkpoint_callback.best_model_path)
+best_initial_training_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt")
 
 ### Testing the model
 system.tokenizer.decode(best_initial_training_model.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
@@ -629,7 +629,7 @@ system.prepare_data() # might not be needed.
 # Create another ModelCheckpoint callback for fine-tuning
 fine_tuning_checkpoint_callback = ModelCheckpoint(
     monitor='val_loss',
-    dirpath='checkpoints',
+    dirpath=os.path.join(script_dir, 'checkpoints'),
     filename='fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
     save_top_k=1,
     mode='min',
