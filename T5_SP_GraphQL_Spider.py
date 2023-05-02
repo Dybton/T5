@@ -421,7 +421,7 @@ class T5MultiSPModel(pl.LightningModule):
     return {'progress_bar': tensorboard_logs, 'log': tensorboard_logs }
     
 
-  def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None, on_tpu=False, using_native_amp=False):
+  def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None, on_tpu=False, using_native_amp=False, using_lbfgs=False):
     if on_tpu or self.trainer.use_tpu:
         xm.optimizer_step(optimizer)
     else:
