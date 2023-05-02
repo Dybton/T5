@@ -148,7 +148,7 @@ class MaskGraphQLDataset(Dataset):
           for example in data:
 
             utterance = example['query'].split()
-            encoded_source = tokenizer.encode(utterance + ' </s>', max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt').squeeze()
+            encoded_source = tokenizer.encode(utterance + ['</s>'], max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt').squeeze()
             token_count = encoded_source.shape[0]
             repeated_utterance = [encoded_source for _ in range(token_count)]
             for pos in range(1, token_count):
