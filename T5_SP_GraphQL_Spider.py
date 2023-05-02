@@ -433,7 +433,7 @@ class T5MultiSPModel(pl.LightningModule):
 
 
   def configure_optimizers(self):
-    t_total = len(self.train_dataloader()) * self.trainer.max_epochs * self.trainer.train_percent_check
+    t_total = len(self.train_dataloader()) * self.trainer.max_epochs * self.trainer.limit_train_batches
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
         {
@@ -607,7 +607,7 @@ checkpoint_callback = ModelCheckpoint(
 )
 
 # Pass the logger and checkpoint_callback to the Trainer
-trainer = pl.Trainer(logger=logger, callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1, train_percent_check=0.2)
+trainer = pl.Trainer(logger=logger, callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
 # Train the model
 trainer.fit(system)
