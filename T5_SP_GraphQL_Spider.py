@@ -603,6 +603,9 @@ trainer = pl.Trainer(logger=logger, callbacks=[checkpoint_callback], accelerator
 # Train the model
 trainer.fit(system)
 
+# Save the last initial training checkpoint
+trainer.save_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt")
+
 system.prepare_data() # might not be needed.
 
 # Load the best initial training model for testing
@@ -638,8 +641,12 @@ trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_i
 # Fine-tune the model
 trainer.fit(system)
 
+# Save the last fine-tuned checkpoint
+trainer.save_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt")
+
 # Load the best fine-tuned model for testing
-best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint(fine_tuning_checkpoint_callback.best_model_path)
+best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt")
+
 
 inputs = best_fine_tuned_model.val_dataset[0]
 best_fine_tuned_model.tokenizer.decode(inputs['source_ids'])
