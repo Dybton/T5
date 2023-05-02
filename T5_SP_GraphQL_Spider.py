@@ -321,7 +321,6 @@ if test_state:
 
 
 class T5MultiSPModel(pl.LightningModule):
-  # def __init__(self, train_sampler=None, tokenizer= None, dataset=None, batch_size = 2):
   def __init__(self, hyperparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2,temperature=1.0,top_k=50, top_p=1.0, num_beams=1 ):
     super(T5MultiSPModel, self).__init__()
 
@@ -330,16 +329,13 @@ class T5MultiSPModel(pl.LightningModule):
     self.top_p = top_p
     self.num_beams = num_beams
 
-    # self.lr=3e-5
     self.hyperparams = hyperparams
 
     self.task = task
     self.test_flag = test_flag
     self.train_sampler = train_sampler
     self.batch_size = batch_size
-    # todo load from file if task is finetine. 
     if self.task == 'finetune':
-      # have to change output_past to True manually
       self.model = T5ForConditionalGeneration.from_pretrained('t5-base')
     else: 
       self.model = T5ForConditionalGeneration.from_pretrained('t5-base') # no output past? 
@@ -350,18 +346,18 @@ class T5MultiSPModel(pl.LightningModule):
     self.add_special_tokens()
 
   def forward(
-    self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, lm_labels=None
+    self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, labels=None
     ):
     return self.model(
         input_ids,
         attention_mask=attention_mask,
         decoder_input_ids=decoder_input_ids,
         decoder_attention_mask=decoder_attention_mask,
-        lm_labels=lm_labels,
+        labels=labels,
     )
 
   def add_special_tokens(self):
-        # new special tokens
+    # new special tokens
     special_tokens_dict = self.tokenizer.special_tokens_map # the issue could be here, might need to copy.
     special_tokens_dict['mask_token'] = '<mask>'
     special_tokens_dict['additional_special_tokens'] = ['<t>', '</t>', '<a>', '</a>']
@@ -369,30 +365,28 @@ class T5MultiSPModel(pl.LightningModule):
     self.tokenizer.add_special_tokens(special_tokens_dict)
     self.model.resize_token_embeddings(len(self.tokenizer))
 
-    # For some reason I need this last line. or maybe it had to do with tensorboard
-
   def _step(self, batch):
     if self.task == 'finetune':
       pad_token_id = self.tokenizer.pad_token_id
       source_ids, source_mask, y = batch["source_ids"], batch["source_mask"], batch["target_ids"]
       # y_ids = y[:, :-1].contiguous()
-      lm_labels = y[:, :].clone()
-      lm_labels[y[:, :] == pad_token_id] = -100
-      # attention_mask is for ignore padding on source_ids
-      # lm_labels need to have pad_token ignored manually by setting to -100
+      labels = y[:, :].clone()
+      labels[y[:, :] == pad_token_id] = -100
+      # attention_mask is for ignore padding on source_ids 
+      # labels need to have pad_token ignored manually by setting to -100
       # todo check the ignore token for forward
       # seems like decoder_input_ids can be removed. 
-      outputs = self(source_ids, attention_mask=source_mask, lm_labels=lm_labels,)
+      outputs = self(source_ids, attention_mask=source_mask, labels=labels,)
 
       loss = outputs[0]
 
     else: 
       y = batch['target_id']
-      lm_labels = y[:, :].clone()
-      lm_labels[y[:, :] == self.tokenizer.pad_token_id] = -100
+      labels = y[:, :].clone()
+      labels[y[:, :] == self.tokenizer.pad_token_id] = -100
       loss = self(
           input_ids=batch["source_ids"],
-          lm_labels=lm_labels
+          labels=labels
       )[0]
 
 
@@ -406,15 +400,17 @@ class T5MultiSPModel(pl.LightningModule):
 
   def validation_step(self, batch, batch_idx):
     loss = self._step(batch)
-      
-    # if self.task == 'finetune':
-    #   preds, target = self._generate_step(batch)
-    #   accuracy = exact_match.exact_match_accuracy(preds,target)
-    #   return {"val_loss": loss, "val_acc": torch.tensor(accuracy) }
-    # else:
+
+    print(f'Validation step called, batch_idx: {batch_idx}, loss: {loss.item()}')
+
     return {"val_loss": loss}
 
-  def validation_epoch_end(self, outputs):
+
+  def on_validation_epoch_end(self, outputs=None):
+    if not outputs:
+        print("Empty outputs list.")
+        return
+    print("outputs " + str(outputs))
     avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
     # if self.task == 'finetune':
     #   avg_acc = torch.stack([x["val_acc"] for x in outputs]).mean()
@@ -460,7 +456,6 @@ class T5MultiSPModel(pl.LightningModule):
         temperature=self.temperature,
         top_k=self.top_k,
         top_p=self.top_p,
-        # repetition_penalty=2.5,
         length_penalty=1.0,
         early_stopping=True,
     )
