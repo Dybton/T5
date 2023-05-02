@@ -94,11 +94,11 @@ class TextToGraphQLDataset(Dataset):
           data = json.load(f)
 
           for element in data:
-            question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']])
-            tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, padding=True, truncation=True, return_tensors='pt')
+            question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']]) + ' </s>'
+            tokenized_s = tokenizer.encode_plus(question_with_schema, max_length=1024, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.encode_plus(element['query'],max_length=block_size, padding='max_length', truncation=True, return_tensors='pt')
+            tokenized_t = tokenizer.encode_plus(element['query'] + ' </s>', max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.target.append(tokenized_t)
             self.schema_ids.append(element['schemaId'])
 
@@ -147,7 +147,7 @@ class MaskGraphQLDataset(Dataset):
           for example in data:
 
             utterance = example['query']
-            encoded_source = tokenizer.encode(utterance, max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
+            encoded_source = tokenizer.encode(utterance + ' </s>', max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt').squeeze()
             token_count = encoded_source.shape[0]
             repeated_utterance = [encoded_source for _ in range(token_count)]
             for pos in range(1, token_count):
@@ -156,15 +156,14 @@ class MaskGraphQLDataset(Dataset):
               if target_id == tokenizer.eos_token_id:
                   break
               encoded_source[pos] = tokenizer.mask_token_id
-              decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id]))
-              encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, padding='max_length', truncation=True).squeeze()
+              decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id])) + ' </s>'
+              encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, pad_to_max_length=True, truncation=True).squeeze()
               if encoded_target is not None and torch.numel(encoded_target) > 0:
                   self.target.append(encoded_target)
                   self.source.append(encoded_source)
               if torch.numel(encoded_target) > 0:
                   self.target.append(encoded_target)
                   self.source.append(encoded_source)
-
 
   def __len__(self):
         'Denotes the total number of samples'
@@ -205,37 +204,19 @@ class SpiderDataset(Dataset):
         self.target = []
         spider_path = './spider/'
         path = spider_path + type_path
-        # TODO open up tables.json
-        # its a list of tables
-        # group by db_id 
-        # grab column name from column_names_original ( each column name is a list of two. and the 2nd index {1} is the column name )
-        # grab table names from table_names (^ same as above )
-        # concat both with the english question (table names + <c> + column names + <q> english question)
-        # tokenize
-
-        # Maybe try making making more structure 
-        # in the concat by using primary_keys and foreign_keys 
-
         tables_path = spider_path + 'tables.json'
 
         with open(path, 'r') as f, open(tables_path, 'r') as t:
           databases = json.load(t)
           data = json.load(f)
 
-          #groupby db_id 
           grouped_dbs = {}
           for db in databases:
             grouped_dbs[db['db_id']] = db
-          # print(grouped_dbs)
-          # end grop tables
 
           for element in data:
             db = grouped_dbs[element['db_id']]
-
-            # tables_names = " ".join(db['table_names_original'])
             db_tables = db['table_names_original']
-
-            # columns_names = " ".join([column_name[1] for column_name in db['column_names_original'] ])
             tables_with_columns = ''
             for table_id, group in itertools.groupby(db['column_names_original'], lambda x: x[0]):
               if table_id == -1:
@@ -244,21 +225,13 @@ class SpiderDataset(Dataset):
               columns_names = " ".join([column_name[1] for column_name in group ])
               tables_with_columns += '<t> ' + db_tables[table_id] + ' <c> ' + columns_names + ' </c> ' + '</t> '
 
-
-            # group columns with tables. 
-
             db_with_question = 'translate English to SQL: ' + element['question'] + ' ' + tables_with_columns
-            # question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']]) + ' </s>'
 
-            tokenized_s = tokenizer.batch_encode_plus([db_with_question],max_length=1024, padding='max_length', truncation=True,return_tensors='pt')
-            # what is the largest example size?
-            # the alternative is to collate
-            #might need to collate
+            tokenized_s = tokenizer.encode_plus(db_with_question, max_length=1024, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.source.append(tokenized_s)
 
-            tokenized_t = tokenizer.batch_encode_plus([element['query']],max_length=block_size, padding='max_length', truncation=True,return_tensors='pt')
+            tokenized_t = tokenizer.encode_plus(element['query'], max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt')
             self.target.append(tokenized_t)
-
 
   def __len__(self):
         'Denotes the total number of samples'
@@ -274,7 +247,6 @@ class SpiderDataset(Dataset):
                 'target_ids': target_ids,
                 'target_ids_y': target_ids}
 
-
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
     dataset = SpiderDataset(tokenizer=tokenizer , type_path='train_spider.json', block_size=102)
@@ -284,8 +256,8 @@ if test_state:
     print("SpiderDataset test done")
 
 class CoSQLMaskDataset(Dataset):
-  'Characterizes a dataset for PyTorch'
-  def __init__(self, tokenizer, type_path='cosql_train.json', block_size=64):
+    'Characterizes a dataset for PyTorch'
+    def __init__(self, tokenizer, type_path='cosql_train.json', block_size=64):
         'Initialization'
         super(CoSQLMaskDataset, ).__init__()
         self.tokenizer = tokenizer
@@ -294,52 +266,36 @@ class CoSQLMaskDataset(Dataset):
         self.target = []
         path = './cosql_dataset/sql_state_tracking/' + type_path
         with open(path, 'r', encoding='utf-8') as f:
-          data = json.load(f)
-          for element in data:
-            for interaction in element['interaction']:
-              # repeat the squence for the amount of tokens. 
-              # loop through those sequences and replace a different token in each one. 
-              # the target will be that token. 
-              utterance = interaction['query']
-              # tokens = utterance.split()
-              encoded_source = tokenizer.encode(utterance, max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
-              token_count = encoded_source.shape[0]
-              # print(encoded_source.shape)
-              repeated_utterance = [encoded_source for _ in range(token_count)]
-              for pos in range(1, token_count):
-                encoded_source = repeated_utterance[pos].clone()
-                target_id = encoded_source[pos].item()
-                if target_id == tokenizer.eos_token_id:
-                  break
-                # encoded_source[pos] = tokenizer.mask_token_id
-                # self.target.append(target_id)
-                # self.source.append(encoded_source)
+            data = json.load(f)
+            for element in data:
+                for interaction in element['interaction']:
+                    utterance = interaction['query']
+                    encoded_source = tokenizer.encode(utterance, max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
+                    token_count = encoded_source.shape[0]
+                    repeated_utterance = [encoded_source for _ in range(token_count)]
+                    for pos in range(1, token_count):
+                        encoded_source = repeated_utterance[pos].clone()
+                        target_id = encoded_source[pos].item()
+                        if target_id == tokenizer.eos_token_id:
+                            break
 
-                encoded_source[pos] = tokenizer.mask_token_id
-                decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id]))
-                encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, padding='max_length', truncation=True).squeeze() # should always be of size 1
-                self.target.append(encoded_target)
-                self.source.append(encoded_source)
+                        encoded_source[pos] = tokenizer.mask_token_id
+                        decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id])) + tokenizer.eos_token
+                        encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, padding='max_length', truncation=True).squeeze()
+                        self.target.append(encoded_target)
+                        self.source.append(encoded_source)
 
-                # repeated_utterance[pos][pos] = target_token # so that the next iteration the previous token is correct
-
-                
-
-
-  def __len__(self):
+    def __len__(self):
         'Denotes the total number of samples'
         return len(self.source)
 
-  def __getitem__(self, index):
+    def __getitem__(self, index):
         'Generates one sample of data'
-        source_ids = self.source[index]#['input_ids'].squeeze()
-        target_id = self.target[index]#['input_ids'].squeeze()
-        # src_mask = self.source[index]['attention_mask'].squeeze()
-        return { 'source_ids': source_ids,
+        source_ids = self.source[index]
+        target_id = self.target[index]
+        return {'source_ids': source_ids,
                 'target_id': target_id}
-                # 'source_mask': src_mask,
-                # 'target_ids': target_ids,
-                # 'target_ids_y': target_ids}
+
 
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
@@ -636,14 +592,9 @@ if tensorflow_active:
             tensorboard_process.terminate()
             tensorboard_process.wait()
 
-
-
-
 import argparse
 from pytorch_lightning.loggers import TensorBoardLogger
 import pytorch_lightning as pl
-
-
 
 hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
 
@@ -743,7 +694,6 @@ if(final_finetuning == True):
     system.task='finetune'
     trainer.fit(system)
     torch.save(system.state_dict(), 'final_training_model_weights.pth')
-
 
 
 system.num_beams = 3
