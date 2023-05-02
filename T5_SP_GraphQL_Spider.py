@@ -594,7 +594,7 @@ logger = TensorBoardLogger("lightning_logs/")
 # Create a ModelCheckpoint callback
 checkpoint_callback = ModelCheckpoint(
     monitor='val_loss',
-    dirpath='checkpoints/',
+    dirpath='.',
     filename='model-{epoch:02d}-{val_loss:.2f}',
     save_top_k=1,
     mode='min',
@@ -629,7 +629,7 @@ system.prepare_data() # might not be needed.
 # Create another ModelCheckpoint callback for fine-tuning
 fine_tuning_checkpoint_callback = ModelCheckpoint(
     monitor='val_loss',
-    dirpath='fine_tuning_checkpoints/',
+    dirpath='.',
     filename='fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
     save_top_k=1,
     mode='min',
@@ -642,7 +642,7 @@ trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_i
 trainer.fit(system)
 
 # Load the best fine-tuned model for testing
-best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint('fine_tuning_checkpoints/fine_tuned_model-<epoch>-<val_loss>.ckpt')
+best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint(fine_tuning_checkpoint_callback.best_model_path)
 
 inputs = best_fine_tuned_model.val_dataset[0]
 best_fine_tuned_model.tokenizer.decode(inputs['source_ids'])
