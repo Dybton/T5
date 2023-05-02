@@ -319,7 +319,7 @@ if test_state:
 
 
 class T5MultiSPModel(pl.LightningModule):
-  def __init__(self, hyperparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2,temperature=1.0,top_k=50, top_p=1.0, num_beams=1 ):
+  def __init__(self, hyperparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2, temperature=1.0, top_k=50, top_p=1.0, num_beams=1):
     super(T5MultiSPModel, self).__init__()
 
     self.temperature = temperature
@@ -335,12 +335,12 @@ class T5MultiSPModel(pl.LightningModule):
     self.batch_size = batch_size
     if self.task == 'finetune':
       self.model = T5ForConditionalGeneration.from_pretrained('t5-base')
-    else: 
-      self.model = T5ForConditionalGeneration.from_pretrained('t5-base') # no output past? 
+    else:
+      self.model = T5ForConditionalGeneration.from_pretrained('t5-base-output-past')
 
-    self.tokenizer = T5Tokenizer.from_pretrained('t5-base')
-    
-    self.criterion = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
+    self.tokenizer = T5TokenizerFast.from_pretrained('t5-base')
+
+    self.criterion = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.mask_token_id)
     self.add_special_tokens()
 
   def forward(
@@ -595,108 +595,87 @@ if tensorflow_active:
 import argparse
 from pytorch_lightning.loggers import TensorBoardLogger
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
 
-# # system = ConvBartSystem(dataset, train_sampler, batch_size=2)
-system = T5MultiSPModel(hyperparams,batch_size=32)
+system = T5MultiSPModel(hyperparams, batch_size=32)
 print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 
 # Initialize the logger
 logger = TensorBoardLogger("lightning_logs/")
-# Pass the logger to the Trainer
-trainer = pl.Trainer(logger=logger)
 
-trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
+## Initial Training
 
-if os.path.exists('model_weights.pth'):
-    # Load the model weights if the file exists
-    system.load_state_dict(torch.load('model_weights.pth'))
+# Create a ModelCheckpoint callback
+checkpoint_callback = ModelCheckpoint(
+    monitor='val_loss',
+    dirpath='checkpoints/',
+    filename='model-{epoch:02d}-{val_loss:.2f}',
+    save_top_k=1,
+    mode='min',
+)
 
-else:
-    # If the weights file doesn't exist, train the model and save the weights after training
-    print("lets train this model!")
-    trainer.fit(system)
-    torch.save(system.state_dict(), 'model_weights.pth')
+# Pass the logger and checkpoint_callback to the Trainer
+trainer = pl.Trainer(logger=logger, callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-system.prepare_data() # might not be needed. 
+# Train the model
+trainer.fit(system)
+
+system.prepare_data() # might not be needed.
+
+# Load the best initial training model for testing
+best_initial_training_model = T5MultiSPModel.load_from_checkpoint(checkpoint_callback.best_model_path)
 
 ### Testing the model
-system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
+system.tokenizer.decode(best_initial_training_model.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
-input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
-system.model.cuda()
+input_ids = best_initial_training_model.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
+best_initial_training_model.model.cuda()
 
-system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
-
+best_initial_training_model.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
 
 # Fine Tuning
 system.task = 'finetune'
 system.batch_size = 2 # because t5-base is smaller than bart.
-
-system.hyperparams
 system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
+system.prepare_data() # might not be needed.
 
-system.prepare_data() # might not be needed. 
+# Create another ModelCheckpoint callback for fine-tuning
+fine_tuning_checkpoint_callback = ModelCheckpoint(
+    monitor='val_loss',
+    dirpath='fine_tuning_checkpoints/',
+    filename='fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
+    save_top_k=1,
+    mode='min',
+)
 
-if os.path.exists('fine_tuned_model_weights.pth'):
-    # Load the model weights if the file exists
-  print("Model is allready fine-tuned, loading weights...")
-  system.load_state_dict(torch.load('fine_tuned_model_weights.pth'))
-  print("fine_tuned_model_weights.pth loaded")
+# Pass the new checkpoint_callback to the Trainer
+trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
 
-else:
-  print("Let's fine-tune this model!")
-  trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
-  trainer.fit(system)
-  torch.save(system.state_dict(), 'fine_tuned_model_weights.pth')
-  
-from pytorch_lightning.callbacks import ModelCheckpoint
+# Fine-tune the model
+trainer.fit(system)
 
+# Load the best fine-tuned model for testing
+best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint('fine_tuning_checkpoints/fine_tuned_model-<epoch>-<val_loss>.ckpt')
 
-
-inputs = system.val_dataset[0]
-system.tokenizer.decode(inputs['source_ids'])
-
-# # system.tokenizer.decode(inputs['target_ids'])
+inputs = best_fine_tuned_model.val_dataset[0]
+best_fine_tuned_model.tokenizer.decode(inputs['source_ids'])
 
 
-# # inputs = system.tokenizer.batch_encode_plus([user_input], max_length=1024, return_tensors='pt')
-# # generated_ids = system.bart.generate(example['input_ids'].cuda(), attention_mask=example['attention_mask'].cuda(), num_beams=5, max_length=40,repetition_penalty=3.0)
-# # maybe i didn't need attention_mask? or the padding was breaking something.
-# # attention mask is only needed  
+best_fine_tuned_model.model = best_fine_tuned_model.model.cuda()
+generated_ids = best_fine_tuned_model.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
 
-system.model = system.model.cuda()
-generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
-# # # summary_text = system.tokenizer.decode(generated_ids[0])
-
-hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+hyps = [best_fine_tuned_model.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
 print("hyps")
 print(hyps)
 
-final_finetuning = True
 
-if(final_finetuning == True):
-  print("we start the final fine-tuning")
-  if os.path.exists('final_training_model_weights.pth'):
-      # Load the model weights if the file exists
-    print("Model is allready fine-tuned for the final time, loading weights...")
-    system.load_state_dict(torch.load('final_training_model_weights.pth'))
-    print("final_training_model_weights.pthloaded")
-  else:
-    print("Let's fine-tune this model for the last time!")
-    #system = system.load_from_checkpoint('fine_tuned_model_weights.pth', hyperparams=hyperparams) # he refers to checkpoints. What are those?
-    system.load_state_dict(torch.load('fine_tuned_model_weights.pth'))
+## Testing
 
-    trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-    system.task='finetune'
-    trainer.fit(system)
-    torch.save(system.state_dict(), 'final_training_model_weights.pth')
-
-
-system.num_beams = 3
-system.test_flag = 'graphql'
-system.prepare_data()
-trainer.test(model=system)
+best_fine_tuned_model.num_beams = 3
+best_fine_tuned_model.test_flag = 'graphql'
+best_fine_tuned_model.prepare_data()
+trainer.test(model=best_fine_tuned_model)
