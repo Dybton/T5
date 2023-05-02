@@ -147,7 +147,7 @@ class MaskGraphQLDataset(Dataset):
           data = json.load(f)
           for example in data:
 
-            utterance = example['query']
+            utterance = example['query'] = utterance.split()
             encoded_source = tokenizer.encode(utterance + ' </s>', max_length=block_size, pad_to_max_length=True, truncation=True, return_tensors='pt').squeeze()
             token_count = encoded_source.shape[0]
             repeated_utterance = [encoded_source for _ in range(token_count)]
@@ -155,16 +155,12 @@ class MaskGraphQLDataset(Dataset):
               encoded_source = repeated_utterance[pos].clone()
               target_id = encoded_source[pos].item()
               if target_id == tokenizer.eos_token_id:
-                  break
+                break
               encoded_source[pos] = tokenizer.mask_token_id
               decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id])) + ' </s>'
-              encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, pad_to_max_length=True, truncation=True).squeeze()
-              if encoded_target is not None and torch.numel(encoded_target) > 0:
-                  self.target.append(encoded_target)
-                  self.source.append(encoded_source)
-              if torch.numel(encoded_target) > 0:
-                  self.target.append(encoded_target)
-                  self.source.append(encoded_source)
+              encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, pad_to_max_length=True, truncation=True).squeeze() # should always be of size 1
+              self.target.append(encoded_target)
+              self.source.append(encoded_source)
 
   def __len__(self):
         'Denotes the total number of samples'
