@@ -319,7 +319,8 @@ if test_state:
 
 
 class T5MultiSPModel(pl.LightningModule):
-  def __init__(self, hyperparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2, temperature=1.0, top_k=50, top_p=1.0, num_beams=1):
+  # def __init__(self, train_sampler=None, tokenizer= None, dataset=None, batch_size = 2):
+  def __init__(self, hparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2,temperature=1.0,top_k=50, top_p=1.0, num_beams=1 ):
     super(T5MultiSPModel, self).__init__()
 
     self.temperature = temperature
@@ -327,35 +328,38 @@ class T5MultiSPModel(pl.LightningModule):
     self.top_p = top_p
     self.num_beams = num_beams
 
-    self.hyperparams = hyperparams
+    # self.lr=3e-5
+    self.hparams = hparams
 
     self.task = task
     self.test_flag = test_flag
     self.train_sampler = train_sampler
     self.batch_size = batch_size
+    # todo load from file if task is finetine. 
     if self.task == 'finetune':
+      # have to change output_past to True manually
       self.model = T5ForConditionalGeneration.from_pretrained('t5-base')
-    else:
-      self.model = T5ForConditionalGeneration.from_pretrained('t5-base')
+    else: 
+      self.model = T5ForConditionalGeneration.from_pretrained('t5-base') # no output past? 
 
-    self.tokenizer = T5TokenizerFast.from_pretrained('t5-base')
-
-    self.criterion = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.mask_token_id)
+    self.tokenizer = T5Tokenizer.from_pretrained('t5-base')
+    
+    self.criterion = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
     self.add_special_tokens()
 
   def forward(
-    self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, labels=None
+    self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, lm_labels=None
     ):
     return self.model(
         input_ids,
         attention_mask=attention_mask,
         decoder_input_ids=decoder_input_ids,
         decoder_attention_mask=decoder_attention_mask,
-        labels=labels,
+        lm_labels=lm_labels,
     )
 
   def add_special_tokens(self):
-    # new special tokens
+        # new special tokens
     special_tokens_dict = self.tokenizer.special_tokens_map # the issue could be here, might need to copy.
     special_tokens_dict['mask_token'] = '<mask>'
     special_tokens_dict['additional_special_tokens'] = ['<t>', '</t>', '<a>', '</a>']
@@ -363,28 +367,30 @@ class T5MultiSPModel(pl.LightningModule):
     self.tokenizer.add_special_tokens(special_tokens_dict)
     self.model.resize_token_embeddings(len(self.tokenizer))
 
+    # For some reason I need this last line. or maybe it had to do with tensorboard
+
   def _step(self, batch):
     if self.task == 'finetune':
       pad_token_id = self.tokenizer.pad_token_id
       source_ids, source_mask, y = batch["source_ids"], batch["source_mask"], batch["target_ids"]
       # y_ids = y[:, :-1].contiguous()
-      labels = y[:, :].clone()
-      labels[y[:, :] == pad_token_id] = -100
-      # attention_mask is for ignore padding on source_ids 
-      # labels need to have pad_token ignored manually by setting to -100
+      lm_labels = y[:, :].clone()
+      lm_labels[y[:, :] == pad_token_id] = -100
+      # attention_mask is for ignore padding on source_ids
+      # lm_labels need to have pad_token ignored manually by setting to -100
       # todo check the ignore token for forward
       # seems like decoder_input_ids can be removed. 
-      outputs = self(source_ids, attention_mask=source_mask, labels=labels,)
+      outputs = self(source_ids, attention_mask=source_mask, lm_labels=lm_labels,)
 
       loss = outputs[0]
 
     else: 
       y = batch['target_id']
-      labels = y[:, :].clone()
-      labels[y[:, :] == self.tokenizer.pad_token_id] = -100
+      lm_labels = y[:, :].clone()
+      lm_labels[y[:, :] == self.tokenizer.pad_token_id] = -100
       loss = self(
           input_ids=batch["source_ids"],
-          labels=labels
+          lm_labels=lm_labels
       )[0]
 
 
@@ -398,17 +404,15 @@ class T5MultiSPModel(pl.LightningModule):
 
   def validation_step(self, batch, batch_idx):
     loss = self._step(batch)
-
-    print(f'Validation step called, batch_idx: {batch_idx}, loss: {loss.item()}')
-
+      
+    # if self.task == 'finetune':
+    #   preds, target = self._generate_step(batch)
+    #   accuracy = exact_match.exact_match_accuracy(preds,target)
+    #   return {"val_loss": loss, "val_acc": torch.tensor(accuracy) }
+    # else:
     return {"val_loss": loss}
 
-
-  def on_validation_epoch_end(self, outputs=None):
-    if not outputs:
-        print("Empty outputs list.")
-        return
-    print("outputs " + str(outputs))
+  def validation_epoch_end(self, outputs):
     avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
     # if self.task == 'finetune':
     #   avg_acc = torch.stack([x["val_acc"] for x in outputs]).mean()
@@ -419,17 +423,17 @@ class T5MultiSPModel(pl.LightningModule):
     return {'progress_bar': tensorboard_logs, 'log': tensorboard_logs }
     
 
-  # def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None):
-  #   if self.trainer:
-  #     xm.optimizer_step(optimizer)
-  #   else:
-  #     optimizer.step()
-  #   optimizer.zero_grad()
-  #   self.lr_scheduler.step()
+  def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None):
+    if self.trainer.use_tpu:
+      xm.optimizer_step(optimizer)
+    else:
+      optimizer.step()
+    optimizer.zero_grad()
+    self.lr_scheduler.step()
 
 
   def configure_optimizers(self):
-    t_total = len(self.train_dataloader()) * self.trainer.max_epochs * self.trainer.limit_train_batches
+    t_total = len(self.train_dataloader()) * self.trainer.max_epochs * self.trainer.train_percent_check
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
         {
@@ -438,7 +442,7 @@ class T5MultiSPModel(pl.LightningModule):
         },
         {"params": [p for n, p in self.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
     ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=self.hyperparams.lr, eps=1e-8)
+    optimizer = AdamW(optimizer_grouped_parameters, lr=self.hparams.lr, eps=1e-8)
     scheduler = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=0, num_training_steps=t_total
     )
@@ -454,6 +458,7 @@ class T5MultiSPModel(pl.LightningModule):
         temperature=self.temperature,
         top_k=self.top_k,
         top_p=self.top_p,
+        # repetition_penalty=2.5,
         length_penalty=1.0,
         early_stopping=True,
     )
@@ -530,31 +535,16 @@ class T5MultiSPModel(pl.LightningModule):
       self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
-  @staticmethod
-  def custom_collate_fn(batch):
-    keys = batch[0].keys()
-    collated_batch = {}
-
-    for key in keys:
-        if key in ['source_ids', 'target_ids']:
-            max_length = max([len(sample[key]) for sample in batch])
-            padded_tensors = [torch.cat([sample[key], torch.zeros(max_length - len(sample[key]), dtype=torch.long)], dim=0) for sample in batch]
-            collated_batch[key] = torch.stack(padded_tensors, dim=0)
-        else:
-            max_length = max([len(sample[key]) for sample in batch])
-            padded_tensors = [torch.cat([sample[key], torch.zeros(max_length - len(sample[key]), dtype=torch.long)], dim=0) for sample in batch]
-            collated_batch[key] = torch.stack(padded_tensors, dim=0)
-
-    return collated_batch
-
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
 
   def val_dataloader(self):
-    return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.val_dataset, batch_size=self.batch_size)
 
   def test_dataloader(self):
-    return DataLoader(self.test_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.test_dataset, batch_size=self.batch_size)
+
+
 
 
 
