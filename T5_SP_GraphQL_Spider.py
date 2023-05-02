@@ -413,6 +413,7 @@ class T5MultiSPModel(pl.LightningModule):
     #   return {"progress_bar": tensorboard_logs, "log": tensorboard_logs}
     # else:
     tensorboard_logs = {"val_loss": avg_loss}
+    print("the avg loss is " + str(avg_loss))
     return {'progress_bar': tensorboard_logs, 'log': tensorboard_logs }
     
 
@@ -609,7 +610,7 @@ trainer.save_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt")
 system.prepare_data() # might not be needed.
 
 # Load the best initial training model for testing
-best_initial_training_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt")
+best_initial_training_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt", hyperparams=hyperparams)
 
 ### Testing the model
 system.tokenizer.decode(best_initial_training_model.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
@@ -645,8 +646,7 @@ trainer.fit(system)
 trainer.save_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt")
 
 # Load the best fine-tuned model for testing
-best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt")
-
+best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt", hyperparams=hyperparams)
 
 inputs = best_fine_tuned_model.val_dataset[0]
 best_fine_tuned_model.tokenizer.decode(inputs['source_ids'])
