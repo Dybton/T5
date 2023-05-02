@@ -591,10 +591,12 @@ logger = TensorBoardLogger("lightning_logs/")
 
 ## Initial Training
 
+script_dir = os.path.dirname(os.path.realpath(__file__))
+
 # Create a ModelCheckpoint callback
 checkpoint_callback = ModelCheckpoint(
     monitor='val_loss',
-    dirpath='.',
+    dirpath=script_dir,
     filename='model-{epoch:02d}-{val_loss:.2f}',
     save_top_k=1,
     mode='min',
@@ -629,7 +631,7 @@ system.prepare_data() # might not be needed.
 # Create another ModelCheckpoint callback for fine-tuning
 fine_tuning_checkpoint_callback = ModelCheckpoint(
     monitor='val_loss',
-    dirpath='.',
+    dirpath=script_dir,
     filename='fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
     save_top_k=1,
     mode='min',
