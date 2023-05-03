@@ -340,6 +340,8 @@ class T5MultiSPModel(pl.LightningModule):
     self.criterion = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
     self.add_special_tokens()
 
+    self.val_dataset = None # Define self.val_dataset to overcome "AttributeError: 'T5MultiSPModel' object has no attribute 'val_dataset'" issue "
+
   def forward(
     self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, labels=None
     ):
@@ -628,7 +630,7 @@ TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = best_initial_training_model.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
 
 best_initial_training_model.to(input_ids.device) #move the model to the same device as the input tensors
-input_ids = input_ids.to(input_ids.device)
+input_ids = input_ids.to(input_ids.device) # ensure that both the input tensor and the model are on the same device.
 generated_output = best_initial_training_model.tokenizer.decode(system.model.generate(input_ids)[0])
 
 # Fine Tuning
