@@ -529,9 +529,9 @@ class T5MultiSPModel(pl.LightningModule):
       self.val_dataset = ConcatDataset([self.val_dataset_g, self.val_dataset_s])
       # self.test_dataset = ConcatDataset([test_dataset_g, test_dataset_s])
       if self.test_flag == 'graphql':
-        self.test_dataset = self.test_dataset_g
+        self.test_dataset = TextToGraphQLDataset(self.tokenizer, type_path='dev.json') # Create a new instance of the dataset
       else:
-        self.test_dataset = self.test_dataset_s
+        self.test_dataset = SpiderDataset(self.tokenizer, type_path='dev.json') # # Create a new instance of the dataset
       
     else:
       train_dataset_g = MaskGraphQLDataset(self.tokenizer)
