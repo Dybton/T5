@@ -396,6 +396,7 @@ class T5MultiSPModel(pl.LightningModule):
 
   # Adding this method to not having to rely on time to solve race condition
   def on_load_checkpoint(self, checkpoint):
+    print("Loading checkpoint...")
     super().on_load_checkpoint(checkpoint)
     self.prepare_data()
 
@@ -521,6 +522,7 @@ class T5MultiSPModel(pl.LightningModule):
         return {"avg_test_loss": avg_loss}
 
   def prepare_data(self):
+    print("Preparing data...")
     if self.task == 'finetune':
       self.train_dataset_g = TextToGraphQLDataset(self.tokenizer)
       self.val_dataset_g = TextToGraphQLDataset(self.tokenizer, type_path='dev.json')
@@ -555,6 +557,7 @@ class T5MultiSPModel(pl.LightningModule):
     return DataLoader(self.val_dataset, batch_size=self.batch_size)
 
   def test_dataloader(self):
+    print("Creating test DataLoader with test_dataset:", self.test_dataset)
     return DataLoader(self.test_dataset, batch_size=self.batch_size)
 
 # # In[42]:
@@ -698,4 +701,5 @@ best_fine_tuned_model.num_beams = 3
 best_fine_tuned_model.test_flag = 'graphql'
 best_fine_tuned_model.prepare_data()
 
+print("Before calling trainer.test, test_dataset is:", best_fine_tuned_model.test_dataset)
 trainer.test(model=best_fine_tuned_model)
