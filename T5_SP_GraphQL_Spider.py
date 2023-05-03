@@ -662,8 +662,9 @@ trainer.save_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt")
 
 # Load the best fine-tuned model for testing
 best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt", hyperparams=hyperparams)
-
+best_fine_tuned_model.prepare_data() # Re added this to make sure the val_dataset attribute of the best_fine_tuned_model object is not None.
 inputs = best_fine_tuned_model.val_dataset[0]
+
 best_fine_tuned_model.tokenizer.decode(inputs['source_ids'])
 
 
