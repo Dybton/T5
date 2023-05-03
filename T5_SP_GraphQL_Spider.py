@@ -628,7 +628,8 @@ TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
 input_ids = best_initial_training_model.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
 
 best_initial_training_model.to(input_ids.device) #move the model to the same device as the input tensors
-generated_output = best_initial_training_model.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
+input_ids = input_ids.to(input_ids.device)
+generated_output = best_initial_training_model.tokenizer.decode(system.model.generate(input_ids)[0])
 
 # Fine Tuning
 system.task = 'finetune'
