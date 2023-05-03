@@ -615,16 +615,20 @@ checkpoint_callback = ModelCheckpoint(
 # Pass the logger and checkpoint_callback to the Trainer
 trainer = pl.Trainer(logger=logger, callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-# Train the model
-trainer.fit(system)
+initial_training_checkpoint_path = "checkpoints/last_initial_training_checkpoint.ckpt"
 
-# Save the last initial training checkpoint
-trainer.save_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt")
-
-system.prepare_data() # might not be needed.
+if not os.path.isfile(initial_training_checkpoint_path):
+    # Train the model if checkpoint does not exist
+    trainer.fit(system)
+    # Save the last initial training checkpoint
+    trainer.save_checkpoint(initial_training_checkpoint_path)
+else:
+    print("Loading initial training checkpoint...")
 
 # Load the best initial training model for testing
-best_initial_training_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_initial_training_checkpoint.ckpt", hyperparams=hyperparams)
+best_initial_training_model = T5MultiSPModel.load_from_checkpoint(initial_training_checkpoint_path, hyperparams=hyperparams)
+
+system.prepare_data() # might not be needed.
 
 ### Testing the model
 system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
@@ -654,14 +658,19 @@ fine_tuning_checkpoint_callback = ModelCheckpoint(
 # Pass the new checkpoint_callback to the Trainer
 trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
 
-# Fine-tune the model
-trainer.fit(system)
 
-# Save the last fine-tuned checkpoint
-trainer.save_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt")
+fine_tuning_checkpoint_path = "checkpoints/last_fine_tuned_checkpoint.ckpt"
+
+if not os.path.isfile(fine_tuning_checkpoint_path):
+    # Fine-tune the model if checkpoint does not exist
+    trainer.fit(system)
+    # Save the last fine-tuned checkpoint
+    trainer.save_checkpoint(fine_tuning_checkpoint_path)
+else:
+    print("Loading fine-tuned checkpoint...")
 
 # Load the best fine-tuned model for testing
-best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint("checkpoints/last_fine_tuned_checkpoint.ckpt", hyperparams=hyperparams)
+best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint(fine_tuning_checkpoint_path, hyperparams=hyperparams)
 best_fine_tuned_model.prepare_data() # Re added this to make sure the val_dataset attribute of the best_fine_tuned_model object is not None.
 inputs = best_fine_tuned_model.val_dataset[0]
 
