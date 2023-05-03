@@ -682,4 +682,7 @@ print(hyps)
 best_fine_tuned_model.num_beams = 3
 best_fine_tuned_model.test_flag = 'graphql'
 best_fine_tuned_model.prepare_data()
+
+time.sleep(1)  # Add a small delay to ensure the test dataset is ready, to avoid "'T5MultiSPModel' object has no attribute 'test_dataset'
+
 trainer.test(model=best_fine_tuned_model)
