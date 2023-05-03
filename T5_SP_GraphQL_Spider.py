@@ -394,6 +394,11 @@ class T5MultiSPModel(pl.LightningModule):
 
     return loss
 
+  # Adding this method to not having to rely on time to solve race condition
+  def on_load_checkpoint(self, checkpoint):
+    super().on_load_checkpoint(checkpoint)
+    self.prepare_data()
+
   def training_step(self, batch, batch_idx):
     loss = self._step(batch)
     print(f'Training step called, batch_idx: {batch_idx}, loss: {loss.item()}')
@@ -685,14 +690,12 @@ hyps = [best_fine_tuned_model.tokenizer.decode(g, skip_special_tokens=True, clea
 print("hyps")
 print(hyps)
 
-import time
-
 ## Testing
+
+print("We have reached the testing phase")
 
 best_fine_tuned_model.num_beams = 3
 best_fine_tuned_model.test_flag = 'graphql'
 best_fine_tuned_model.prepare_data()
-
-time.sleep(1)  # Add a small delay to ensure the test dataset is ready, to avoid "'T5MultiSPModel' object has no attribute 'test_dataset'
 
 trainer.test(model=best_fine_tuned_model)
