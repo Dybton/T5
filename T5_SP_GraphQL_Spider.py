@@ -51,8 +51,11 @@ import transformers
 import pytorch_lightning
 
 print("my version of transformers is " + transformers.__version__)
-print ("my version of pytorch is " + torch.__version__)
 print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
+print("PyTorch version:", torch.__version__)
+print("CUDA version:", torch.version.cuda)
+print("CUDNN version:", torch.backends.cudnn.version())
+print("GPU available:", torch.cuda.is_available())
 
 
 test_state = False
