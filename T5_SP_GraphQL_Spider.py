@@ -632,7 +632,7 @@ else:
     print("Loading initial training checkpoint...")
 
 # Load the best initial training model for testing
-best_initial_training_model = T5MultiSPModel.load_from_checkpoint(initial_training_checkpoint_path, hyperparams=hyperparams)
+system = system.load_from_checkpoint(initial_training_checkpoint_path, hyperparams=hyperparams)
 
 system.prepare_data() # might not be needed.
 
@@ -640,11 +640,11 @@ system.prepare_data() # might not be needed.
 system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
 
 TXT = "query { faculty_aggregate { aggregate { <mask> } } } </s>"
-input_ids = best_initial_training_model.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
+input_ids = system.tokenizer.batch_encode_plus([TXT], return_tensors='pt')['input_ids']
 
-best_initial_training_model.to(input_ids.device) #move the model to the same device as the input tensors
+system.to(input_ids.device) #move the model to the same device as the input tensors
 input_ids = input_ids.to(input_ids.device) # ensure that both the input tensor and the model are on the same device.
-generated_output = best_initial_training_model.tokenizer.decode(system.model.generate(input_ids)[0])
+generated_output = system.tokenizer.decode(system.model.generate(input_ids)[0])
 
 # Fine Tuning
 system.task = 'finetune'
@@ -676,17 +676,17 @@ else:
     print("Loading fine-tuned checkpoint...")
 
 # Load the best fine-tuned model for testing
-best_fine_tuned_model = T5MultiSPModel.load_from_checkpoint(fine_tuning_checkpoint_path, hyperparams=hyperparams)
-best_fine_tuned_model.prepare_data() # Re added this to make sure the val_dataset attribute of the best_fine_tuned_model object is not None.
-inputs = best_fine_tuned_model.val_dataset[0]
+system = system.load_from_checkpoint(fine_tuning_checkpoint_path, hyperparams=hyperparams)
+system.prepare_data() # Re added this to make sure the val_dataset attribute of the best_fine_tuned_model object is not None.
+inputs = system.val_dataset[0]
 
-best_fine_tuned_model.tokenizer.decode(inputs['source_ids'])
+system.tokenizer.decode(inputs['source_ids'])
 
 
-best_fine_tuned_model.model = best_fine_tuned_model.model.cuda()
-generated_ids = best_fine_tuned_model.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
+system.model = system.model.cuda()
+generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
 
-hyps = [best_fine_tuned_model.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
+hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
 print("hyps")
 print(hyps)
@@ -695,9 +695,10 @@ print(hyps)
 
 print("We have reached the testing phase")
 
-best_fine_tuned_model.num_beams = 3
-best_fine_tuned_model.test_flag = 'graphql'
-best_fine_tuned_model.prepare_data()
 
-print("Before calling trainer.test, test_dataset is:", best_fine_tuned_model.test_dataset)
-trainer.test(model=best_fine_tuned_model)
+system.num_beams = 3
+system.test_flag = 'graphql'
+system.prepare_data()
+
+print("Before calling trainer.test, test_dataset is:", system.test_dataset)
+trainer.test(model=system)
