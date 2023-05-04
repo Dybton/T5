@@ -522,6 +522,7 @@ class T5MultiSPModel(pl.LightningModule):
   def prepare_data(self):
     print("Preparing data...")
     if self.task == 'finetune':
+      print("Preparing data for finetuning...") # If we don't see this, then I reckon we're not in finetuning mode
       self.train_dataset_g = TextToGraphQLDataset(self.tokenizer)
       self.val_dataset_g = TextToGraphQLDataset(self.tokenizer, type_path='dev.json')
       self.test_dataset_g = TextToGraphQLDataset(self.tokenizer, type_path='dev.json')
@@ -695,10 +696,9 @@ print(hyps)
 
 print("We have reached the testing phase")
 
-
 system.num_beams = 3
 system.test_flag = 'graphql'
-system.prepare_data()
+system.prepare_data() # We are fine tuning should come after the we have reached the testing phase.
 
 print("Before calling trainer.test, test_dataset is:", system.test_dataset)
 trainer.test(model=system)
