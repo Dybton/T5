@@ -670,6 +670,7 @@ fine_tuning_checkpoint_path = "checkpoints/last_fine_tuned_checkpoint.ckpt"
 
 if not os.path.isfile(fine_tuning_checkpoint_path):
     # Fine-tune the model if checkpoint does not exist
+    system.task='finetune'
     trainer.fit(system)
     # Save the last fine-tuned checkpoint
     trainer.save_checkpoint(fine_tuning_checkpoint_path)
@@ -678,6 +679,7 @@ else:
 
 # Load the best fine-tuned model for testing
 system = system.load_from_checkpoint(fine_tuning_checkpoint_path, hyperparams=hyperparams)
+system.task='finetune'
 system.prepare_data() # Re added this to make sure the val_dataset attribute of the best_fine_tuned_model object is not None.
 inputs = system.val_dataset[0]
 
@@ -697,6 +699,7 @@ print(hyps)
 print("We have reached the testing phase")
 
 system.num_beams = 3
+system.task='finetune'
 system.test_flag = 'graphql'
 system.prepare_data() # We are fine tuning should come after the we have reached the testing phase.
 
