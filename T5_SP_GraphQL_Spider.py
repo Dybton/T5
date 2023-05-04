@@ -343,9 +343,6 @@ class T5MultiSPModel(pl.LightningModule):
     self.criterion = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
     self.add_special_tokens()
 
-    self.val_dataset = None # Define self.val_dataset to overcome "AttributeError: 'T5MultiSPModel' object has no attribute 'val_dataset'" issue "
-    self.test_dataset = None # Defining the test_dataset to allivate the error : AttributeError: 'T5MultiSPModel' object has no attribute 'test_dataset'
-
   def forward(
     self, input_ids, attention_mask=None, decoder_input_ids=None, decoder_attention_mask=None, labels=None
     ):
