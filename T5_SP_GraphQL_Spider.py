@@ -633,7 +633,7 @@ import pytorch_lightning as pl
 
 hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
 
-system = T5MultiSPModel(hyperparams,batch_size=32)
+system = T5MultiSPModel(hyperparams,batch_size=16)
 print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 
 # Initialize the logger
