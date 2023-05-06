@@ -3,6 +3,8 @@ print("my version of transformers is " + transformers.__version__)
 
 
 # In[31]:
+import transformers
+print("my version of transformers is " + transformers.__version__)
 import numpy as np
 import pandas as pd
 import torch
@@ -12,6 +14,7 @@ from torch.optim import Adam
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 from functools import partial
+import random
 
 from transformers import get_linear_schedule_with_warmup, AutoConfig 
 from transformers import BartTokenizer,BartModel,BartForConditionalGeneration
@@ -52,9 +55,13 @@ print("my version of transformers is " + transformers.__version__)
 print ("my version of pytorch is " + torch.__version__)
 print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
+# In[2]:
 
-test_state = False
+test_state = True
 tensorflow_active = False
+dev_mode = True
+
+# In[3]:
 
 class TextToGraphQLDataset(Dataset):
   'Characterizes a dataset for PyTorch'
@@ -78,6 +85,19 @@ class TextToGraphQLDataset(Dataset):
            with open(schema_path, 'r', encoding='utf-8') as s:
             
              data = json.load(s)
+
+             if(dev_mode):
+                # Convert dictionary to a list of items
+                data_items = list(data.items())
+                # Set a fixed random seed
+                random.seed(42)
+                # Shuffle the data and take the first 10% of it
+                random.shuffle(data_items)
+                data_items = data_items[:len(data_items) // 10]
+                # Convert the list of items back to a dictionary
+                data = dict(data_items)
+                # Print the first 3 data points
+                print("First 3 data points:", list(data.items())[:3])
 
              type_field_tokens = [ ['<t>'] + [t['name']] + ['{'] + [ f['name'] for f in t['fields']] + ['}'] + ['</t>'] for t in data['types']]
              type_field_flat_tokens = reduce(list.__add__, type_field_tokens)
@@ -144,6 +164,20 @@ class MaskGraphQLDataset(Dataset):
         path = './SPEGQL-dataset/dataset/' + type_path
         with open(path, "r", encoding="utf-8") as f:
           data = json.load(f)
+
+          if(dev_mode):
+              # Convert dictionary to a list of items
+              data_items = list(data.items())
+              # Set a fixed random seed
+              random.seed(42)
+              # Shuffle the data and take the first 10% of it
+              random.shuffle(data_items)
+              data_items = data_items[:len(data_items) // 10]
+              # Convert the list of items back to a dictionary
+              data = dict(data_items)
+              # Print the first 3 data points
+              print("First 3 data points:", list(data.items())[:3])
+
           for example in data:
 
             utterance = example['query']
@@ -222,6 +256,19 @@ class SpiderDataset(Dataset):
           databases = json.load(t)
           data = json.load(f)
 
+          if(dev_mode):
+                # Convert dictionary to a list of items
+                data_items = list(data.items())
+                # Set a fixed random seed
+                random.seed(42)
+                # Shuffle the data and take the first 10% of it
+                random.shuffle(data_items)
+                data_items = data_items[:len(data_items) // 10]
+                # Convert the list of items back to a dictionary
+                data = dict(data_items)
+                # Print the first 3 data points
+                print("First 3 data points:", list(data.items())[:3])
+
           #groupby db_id 
           grouped_dbs = {}
           for db in databases:
@@ -293,6 +340,20 @@ class CoSQLMaskDataset(Dataset):
         path = './cosql_dataset/sql_state_tracking/' + type_path
         with open(path, 'r', encoding='utf-8') as f:
           data = json.load(f)
+
+          if(dev_mode):
+                # Convert dictionary to a list of items
+                data_items = list(data.items())
+                # Set a fixed random seed
+                random.seed(42)
+                # Shuffle the data and take the first 10% of it
+                random.shuffle(data_items)
+                data_items = data_items[:len(data_items) // 10]
+                # Convert the list of items back to a dictionary
+                data = dict(data_items)
+                # Print the first 3 data points
+                print("First 3 data points:", list(data.items())[:3])
+
           for element in data:
             for interaction in element['interaction']:
               # repeat the squence for the amount of tokens. 
