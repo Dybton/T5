@@ -57,7 +57,7 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 # In[2]:
 
-test_state = True
+test_state = False
 tensorflow_active = False
 dev_mode = True
 
@@ -113,6 +113,17 @@ class TextToGraphQLDataset(Dataset):
         with open(dataset_path, 'r', encoding='utf-8') as f:
           data = json.load(f)
 
+          if(dev_mode):
+            random.seed(42)
+            
+            random.shuffle(data)
+            data = data[:len(data) // 10]
+
+            # Print the first 3 data points
+            print("First 3 data points:", data[:3])
+
+          print("Number of data points:", len(data))
+
           for element in data:
             question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']])
             tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, padding=True, truncation=True, return_tensors='pt')
@@ -166,17 +177,15 @@ class MaskGraphQLDataset(Dataset):
           data = json.load(f)
 
           if(dev_mode):
-              # Convert dictionary to a list of items
-              data_items = list(data.items())
-              # Set a fixed random seed
-              random.seed(42)
-              # Shuffle the data and take the first 10% of it
-              random.shuffle(data_items)
-              data_items = data_items[:len(data_items) // 10]
-              # Convert the list of items back to a dictionary
-              data = dict(data_items)
-              # Print the first 3 data points
-              print("First 3 data points:", list(data.items())[:3])
+            random.seed(42)
+            
+            random.shuffle(data)
+            data = data[:len(data) // 10]
+
+            # Print the first 3 data points
+            print("First 3 data points:", data[:3])
+
+          print("Number of data points:", len(data))
 
           for example in data:
 
@@ -257,17 +266,15 @@ class SpiderDataset(Dataset):
           data = json.load(f)
 
           if(dev_mode):
-                # Convert dictionary to a list of items
-                data_items = list(data.items())
-                # Set a fixed random seed
-                random.seed(42)
-                # Shuffle the data and take the first 10% of it
-                random.shuffle(data_items)
-                data_items = data_items[:len(data_items) // 10]
-                # Convert the list of items back to a dictionary
-                data = dict(data_items)
-                # Print the first 3 data points
-                print("First 3 data points:", list(data.items())[:3])
+            random.seed(42)
+            
+            random.shuffle(data)
+            data = data[:len(data) // 10]
+
+            # Print the first 3 data points
+            print("First 3 data points:", data[:3])
+
+          print("Number of data points:", len(data))
 
           #groupby db_id 
           grouped_dbs = {}
@@ -342,17 +349,15 @@ class CoSQLMaskDataset(Dataset):
           data = json.load(f)
 
           if(dev_mode):
-                # Convert dictionary to a list of items
-                data_items = list(data.items())
-                # Set a fixed random seed
-                random.seed(42)
-                # Shuffle the data and take the first 10% of it
-                random.shuffle(data_items)
-                data_items = data_items[:len(data_items) // 10]
-                # Convert the list of items back to a dictionary
-                data = dict(data_items)
-                # Print the first 3 data points
-                print("First 3 data points:", list(data.items())[:3])
+            random.seed(42)
+            
+            random.shuffle(data)
+            data = data[:len(data) // 10]
+
+            # Print the first 3 data points
+            print("First 3 data points:", data[:3])
+
+          print("Number of data points:", len(data))
 
           for element in data:
             for interaction in element['interaction']:
