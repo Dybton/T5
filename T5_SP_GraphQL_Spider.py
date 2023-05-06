@@ -86,19 +86,6 @@ class TextToGraphQLDataset(Dataset):
             
              data = json.load(s)
 
-             if(dev_mode):
-                # Convert dictionary to a list of items
-                data_items = list(data.items())
-                # Set a fixed random seed
-                random.seed(42)
-                # Shuffle the data and take the first 10% of it
-                random.shuffle(data_items)
-                data_items = data_items[:len(data_items) // 10]
-                # Convert the list of items back to a dictionary
-                data = dict(data_items)
-                # Print the first 3 data points
-                print("First 3 data points:", list(data.items())[:3])
-
              type_field_tokens = [ ['<t>'] + [t['name']] + ['{'] + [ f['name'] for f in t['fields']] + ['}'] + ['</t>'] for t in data['types']]
              type_field_flat_tokens = reduce(list.__add__, type_field_tokens)
 
