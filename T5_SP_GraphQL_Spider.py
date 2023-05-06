@@ -107,9 +107,9 @@ class TextToGraphQLDataset(Dataset):
             data = data[:len(data) // 10]
 
             # Print the first 3 data points
-            print("First 3 data points:", data[:3])
+            #print("First 3 data points:", data[:3])
 
-          print("Number of data points:", len(data))
+          #print("Number of data points:", len(data))
 
           for element in data:
             question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']])
@@ -170,9 +170,9 @@ class MaskGraphQLDataset(Dataset):
             data = data[:len(data) // 10]
 
             # Print the first 3 data points
-            print("First 3 data points:", data[:3])
+            #print("First 3 data points:", data[:3])
 
-          print("Number of data points:", len(data))
+          #print("Number of data points:", len(data))
 
           for example in data:
 
@@ -219,7 +219,6 @@ if test_state:
     tokenizer.add_tokens(['{', '}', '<c>', '</c>'])
     tokenizer.add_special_tokens(special_tokens_dict)
     #model.resize_token_embeddings(len(tokenizer))
-    print(tokenizer.mask_token)
 
     dataset = MaskGraphQLDataset(tokenizer=tokenizer, type_path='train.json', block_size=64)
     print("MaskGraphQLDataset test done")
@@ -259,9 +258,9 @@ class SpiderDataset(Dataset):
             data = data[:len(data) // 10]
 
             # Print the first 3 data points
-            print("First 3 data points:", data[:3])
+            #print("First 3 data points:", data[:3])
 
-          print("Number of data points:", len(data))
+          #print("Number of data points:", len(data))
 
           #groupby db_id 
           grouped_dbs = {}
@@ -342,9 +341,9 @@ class CoSQLMaskDataset(Dataset):
             data = data[:len(data) // 10]
 
             # Print the first 3 data points
-            print("First 3 data points:", data[:3])
+            #print("First 3 data points:", data[:3])
 
-          print("Number of data points:", len(data))
+          #print("Number of data points:", len(data))
 
           for element in data:
             for interaction in element['interaction']:
@@ -396,7 +395,7 @@ if test_state:
     tokenizer.add_tokens(['{', '}', '<c>', '</c>'])
     tokenizer.add_special_tokens(special_tokens_dict)
     #model.resize_token_embeddings(len(tokenizer))
-    print(tokenizer.mask_token)
+    #print(tokenizer.mask_token)
 
     dataset = CoSQLMaskDataset(tokenizer=tokenizer , type_path='cosql_train.json', block_size=64)
 
