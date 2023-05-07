@@ -680,7 +680,7 @@ if tensorflow_active:
 import argparse
 from pytorch_lightning.loggers import TensorBoardLogger
 import pytorch_lightning as pl
-
+from pytorch_lightning.callbacks import ModelCheckpoint
 random.seed(42)
 torch.manual_seed(42)
 
@@ -691,21 +691,38 @@ print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 
 # Initialize the logger
 logger = TensorBoardLogger("lightning_logs/")
+
+## Initial Training
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+
+# Create a ModelCheckpoint callback
+checkpoint_callback = ModelCheckpoint(
+    monitor='val_loss',
+    dirpath=os.path.join(script_dir, 'checkpoints'),
+    filename='model-{epoch:02d}-{val_loss:.2f}',
+    save_top_k=1,
+    mode='min',
+)
 trainer = pl.Trainer(logger=logger)
 
-trainer = Trainer(accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
+# Pass the logger and checkpoint_callback to the Trainer
+trainer = pl.Trainer(callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-if os.path.exists('model_weights.pth'):
-    # Load the model weights if the file exists
-    system.load_state_dict(torch.load('model_weights.pth'))
+initial_training_checkpoint_path = "checkpoints/last_initial_training_checkpoint.ckpt"
 
-else:
-    # If the weights file doesn't exist, train the model and save the weights after training
-    print("lets train this model!")
+if not os.path.isfile(initial_training_checkpoint_path):
+    # Train the model if checkpoint does not exist
     trainer.fit(system)
-    torch.save(system.state_dict(), 'model_weights.pth')
+    # Save the last initial training checkpoint
+    trainer.save_checkpoint(initial_training_checkpoint_path)
+else:
+    print("Loading initial training checkpoint...")
 
-system.prepare_data() # might not be needed. 
+# Load the best initial training model for testing
+system = system.load_from_checkpoint(initial_training_checkpoint_path, hyperparams=hyperparams)
+
+system.prepare_data() # might not be needed.
 
 ### Testing the model
 system.tokenizer.decode(system.train_dataset[0]['source_ids'].squeeze(), skip_special_tokens=False, clean_up_tokenization_spaces=False)
@@ -719,68 +736,58 @@ system.tokenizer.decode(system.model.generate(input_ids.cuda())[0])
 # Fine Tuning
 system.task = 'finetune'
 system.batch_size = 2 # because t5-base is smaller than bart.
-system.hyperparams
 system.hyperparams.lr=0.0005248074602497723 # same as 5e-4
-system.prepare_data() # might not be needed. 
+system.prepare_data() # might not be needed.
 
-if os.path.exists('fine_tuned_model_weights.pth'):
-    # Load the model weights if the file exists
-  print("Model is allready fine-tuned, loading weights...")
-  system.load_state_dict(torch.load('fine_tuned_model_weights.pth'))
-  print("fine_tuned_model_weights.pth loaded")
+# Create another ModelCheckpoint callback for fine-tuning
+fine_tuning_checkpoint_callback = ModelCheckpoint(
+    monitor='val_loss',
+    dirpath=os.path.join(script_dir, 'checkpoints'),
+    filename='fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
+    save_top_k=1,
+    mode='min',
+)
 
+# Pass the new checkpoint_callback to the Trainer
+trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
+
+
+fine_tuning_checkpoint_path = "checkpoints/last_fine_tuned_checkpoint.ckpt"
+
+if not os.path.isfile(fine_tuning_checkpoint_path):
+    # Fine-tune the model if checkpoint does not exist
+    system.task='finetune'
+    trainer.fit(system)
+    # Save the last fine-tuned checkpoint
+    trainer.save_checkpoint(fine_tuning_checkpoint_path)
 else:
-  print("Let's fine-tune this model!")
-  trainer = Trainer(gpus=1, max_epochs=5, progress_bar_refresh_rate=1, val_check_interval=0.5)
-  trainer.fit(system)
-  torch.save(system.state_dict(), 'fine_tuned_model_weights.pth')
-  
-from pytorch_lightning.callbacks import ModelCheckpoint
+    print("Loading fine-tuned checkpoint...")
 
-
-
+# Load the best fine-tuned model for testing
+system = system.load_from_checkpoint(fine_tuning_checkpoint_path, hyperparams=hyperparams)
+system.task='finetune'
+system.prepare_data() # Re added this to make sure the val_dataset attribute of the best_fine_tuned_model object is not None.
 inputs = system.val_dataset[0]
+
 system.tokenizer.decode(inputs['source_ids'])
 
-# # system.tokenizer.decode(inputs['target_ids'])
-
-
-# # inputs = system.tokenizer.batch_encode_plus([user_input], max_length=1024, return_tensors='pt')
-# # generated_ids = system.bart.generate(example['input_ids'].cuda(), attention_mask=example['attention_mask'].cuda(), num_beams=5, max_length=40,repetition_penalty=3.0)
-# # maybe i didn't need attention_mask? or the padding was breaking something.
-# # attention mask is only needed  
 
 system.model = system.model.cuda()
 generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
-# # # summary_text = system.tokenizer.decode(generated_ids[0])
 
 hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in generated_ids]
 
 print("hyps")
 print(hyps)
 
-final_finetuning = True
+## Testing
 
-if(final_finetuning == True):
-  print("we start the final fine-tuning")
-  if os.path.exists('final_training_model_weights.pth'):
-      # Load the model weights if the file exists
-    print("Model is allready fine-tuned for the final time, loading weights...")
-    system.load_state_dict(torch.load('final_training_model_weights.pth'))
-    print("final_training_model_weights.pthloaded")
-  else:
-    print("Let's fine-tune this model for the last time!")
-    #system = system.load_from_checkpoint('fine_tuned_model_weights.pth', hyperparams=hyperparams) # he refers to checkpoints. What are those?
-    system.load_state_dict(torch.load('fine_tuned_model_weights.pth'))
-
-    trainer = Trainer(gpus=1, max_epochs=0, progress_bar_refresh_rate=1, val_check_interval=0.5)
-    system.task='finetune'
-    trainer.fit(system)
-    torch.save(system.state_dict(), 'final_training_model_weights.pth')
-
+print("We have reached the testing phase")
 
 system.num_beams = 3
+system.task='finetune'
 system.test_flag = 'graphql'
-system.prepare_data()
+system.prepare_data() # We are fine tuning should come after the we have reached the testing phase.
+
+print("Before calling trainer.test, test_dataset is:", system.test_dataset)
 trainer.test(model=system)
-# %%
