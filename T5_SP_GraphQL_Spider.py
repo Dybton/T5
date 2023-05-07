@@ -104,7 +104,7 @@ class TextToGraphQLDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -167,7 +167,7 @@ class MaskGraphQLDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -255,7 +255,7 @@ class SpiderDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -338,7 +338,7 @@ class CoSQLMaskDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -395,7 +395,6 @@ if test_state:
     tokenizer.add_tokens(['{', '}', '<c>', '</c>'])
     tokenizer.add_special_tokens(special_tokens_dict)
     #model.resize_token_embeddings(len(tokenizer))
-    #print(tokenizer.mask_token)
 
     dataset = CoSQLMaskDataset(tokenizer=tokenizer , type_path='cosql_train.json', block_size=64)
 
@@ -405,7 +404,6 @@ if test_state:
 
 
 # # # Model
-
 
 class T5MultiSPModel(pl.LightningModule):
   def __init__(self, hyperparams, task='denoise', test_flag='graphql', train_sampler=None, batch_size=2,temperature=1.0,top_k=50, top_p=1.0, num_beams=1 ):
@@ -682,6 +680,9 @@ if tensorflow_active:
 import argparse
 from pytorch_lightning.loggers import TensorBoardLogger
 import pytorch_lightning as pl
+
+random.seed(42)
+torch.manual_seed(42)
 
 hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
 
