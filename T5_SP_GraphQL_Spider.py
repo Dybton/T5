@@ -59,7 +59,7 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-dev_mode = True
+dev_mode = False
 
 # In[3]:
 
