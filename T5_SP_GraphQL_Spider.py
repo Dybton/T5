@@ -209,7 +209,7 @@ class MaskGraphQLDataset(Dataset):
 
 
 class MaskTextToGraphQLDatasetSyntheticData(Dataset):
-  def __init__(self, tokenizer, type_path='synthetic_data.json', block_size=64):
+  def __init__(self, tokenizer, type_path='synthetic.json', block_size=64):
       'Initialization'
       super(MaskTextToGraphQLDatasetSyntheticData, ).__init__()
       self.tokenizer = tokenizer
