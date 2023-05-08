@@ -208,6 +208,50 @@ class MaskGraphQLDataset(Dataset):
                 'target_id': target_id}
 
 
+class MaskTextToGraphQLDatasetSyntheticData(Dataset):
+  def __init__(self, tokenizer, type_path='synthetic_data.json', block_size=64):
+      'Initialization'
+      super(MaskTextToGraphQLDatasetSyntheticData, ).__init__()
+      self.tokenizer = tokenizer
+
+      self.source = []
+      self.target = []
+      path = './SPEGQL-dataset/dataset/' + type_path
+      with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+        for example in data:
+
+          utterance = example['query']
+          encoded_source = tokenizer.encode(utterance, max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
+          token_count = encoded_source.shape[0]
+          repeated_utterance = [encoded_source for _ in range(token_count)]
+          for pos in range(1, token_count):
+            encoded_source = repeated_utterance[pos].clone()
+            target_id = encoded_source[pos].item()
+            if target_id == tokenizer.eos_token_id:
+                break
+            encoded_source[pos] = tokenizer.mask_token_id
+            decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id]))
+            encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, padding='max_length', truncation=True).squeeze()
+            if encoded_target is not None and torch.numel(encoded_target) > 0:
+                self.target.append(encoded_target)
+                self.source.append(encoded_source)
+            if torch.numel(encoded_target) > 0:
+                self.target.append(encoded_target)
+                self.source.append(encoded_source)
+
+  def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.source)
+
+  def __getitem__(self, index):
+        'Generates one sample of data'
+        source_ids = self.source[index]
+        target_id = self.target[index]
+        return { 'source_ids': source_ids,
+                'target_id': target_id}
+
 # # In[36]:
 
 if test_state:
@@ -608,13 +652,15 @@ class T5MultiSPModel(pl.LightningModule):
         self.test_dataset = self.test_dataset_s
       
     else:
+      train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
+
       train_dataset_g = MaskGraphQLDataset(self.tokenizer)
       val_dataset_g = MaskGraphQLDataset(self.tokenizer, type_path='dev.json')
 
       train_dataset_s = CoSQLMaskDataset(self.tokenizer)
       val_dataset_s = CoSQLMaskDataset(self.tokenizer, type_path='cosql_dev.json')
 
-      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
+      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s, train_dataset_synth])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
   @staticmethod
