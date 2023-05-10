@@ -59,7 +59,8 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-dev_mode = False
+dev_mode = True
+train_set = "synthetic_mirror_1500.json"
 
 # In[3]:
 
@@ -209,7 +210,7 @@ class MaskGraphQLDataset(Dataset):
 
 
 class MaskTextToGraphQLDatasetSyntheticData(Dataset):
-  def __init__(self, tokenizer, type_path='synthetic.json', block_size=64):
+  def __init__(self, tokenizer, type_path=train_set, block_size=64):
       'Initialization'
       super(MaskTextToGraphQLDatasetSyntheticData, ).__init__()
       self.tokenizer = tokenizer
@@ -650,6 +651,8 @@ class T5MultiSPModel(pl.LightningModule):
         self.test_dataset = self.test_dataset_g
       else:
         self.test_dataset = self.test_dataset_s
+    
+    # elif self.task == 'synthetic':
       
     else:
       train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
@@ -755,7 +758,7 @@ trainer = pl.Trainer(logger=logger)
 # Pass the logger and checkpoint_callback to the Trainer
 trainer = pl.Trainer(callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-initial_training_checkpoint_path = "checkpoints/last_initial_training_checkpoint.ckpt"
+initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}.ckpt"
 
 if not os.path.isfile(initial_training_checkpoint_path):
     # Train the model if checkpoint does not exist
@@ -798,7 +801,8 @@ fine_tuning_checkpoint_callback = ModelCheckpoint(
 trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
 
 
-fine_tuning_checkpoint_path = "checkpoints/last_fine_tuned_checkpoint.ckpt"
+fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}.ckpt"
+
 
 if not os.path.isfile(fine_tuning_checkpoint_path):
     # Fine-tune the model if checkpoint does not exist
@@ -817,7 +821,6 @@ inputs = system.val_dataset[0]
 
 system.tokenizer.decode(inputs['source_ids'])
 
-
 system.model = system.model.cuda()
 generated_ids = system.model.generate(inputs['source_ids'].unsqueeze(0).cuda(), num_beams=5, repetition_penalty=1.0, max_length=56, early_stopping=True)
 
@@ -825,6 +828,42 @@ hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenizati
 
 print("hyps")
 print(hyps)
+
+# FINE TUNING WITH SYNTHETIC DATA
+
+# # Fine Tuning with synthetic dataset
+# system.task = 'synthetic'
+# system.batch_size = 2 # adjust batch size if needed
+# system.hyperparams.lr = 0.0005248074602497723 # you can adjust learning rate if needed
+
+# system.prepare_data() # Load the synthetic dataset
+
+# # Create another ModelCheckpoint callback for synthetic fine-tuning
+# synthetic_fine_tuning_checkpoint_callback = ModelCheckpoint(
+#     monitor='val_loss',
+#     dirpath=os.path.join(script_dir, 'checkpoints'),
+#     filename='synthetic_fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
+#     save_top_k=1,
+#     mode='min',
+# )
+
+# # Pass the new checkpoint_callback to the Trainer
+# trainer = Trainer(gpus=1, max_epochs=2, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[synthetic_fine_tuning_checkpoint_callback])
+
+# synthetic_fine_tuning_checkpoint_path = "checkpoints/last_synthetic_fine_tuned_checkpoint.ckpt"
+
+# if not os.path.isfile(synthetic_fine_tuning_checkpoint_path):
+#     # Fine-tune the model with synthetic dataset if checkpoint does not exist
+#     trainer.fit(system)
+#     # Save the last synthetic fine-tuned checkpoint
+#     trainer.save_checkpoint(synthetic_fine_tuning_checkpoint_path)
+# else:
+#     print("Loading synthetic fine-tuned checkpoint...")
+
+# # Load the best synthetic fine-tuned model for testing
+# system = system.load_from_checkpoint(synthetic_fine_tuning_checkpoint_path, hyperparams=hyperparams)
+# system.task = 'synthetic'
+# system.prepare_data() # Re added this to make sure the val_dataset attribute of the best_synthetic_fine_tuned_model object is not None.
 
 ## Testing
 
