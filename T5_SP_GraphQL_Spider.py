@@ -730,7 +730,8 @@ import argparse
 from pytorch_lightning.loggers import TensorBoardLogger
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
-random.seed(42)
+if(dev_mode):
+    random.seed(42)
 torch.manual_seed(42)
 
 hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
