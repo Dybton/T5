@@ -62,7 +62,7 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-dev_mode = False
+dev_mode = True
 train_set = "synthetic_mirror_1500.json"
 
 # In[3]:
@@ -687,7 +687,7 @@ class T5MultiSPModel(pl.LightningModule):
     return collated_batch
 
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=32)
 
   def val_dataloader(self):
     return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
