@@ -108,7 +108,7 @@ class TextToGraphQLDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -171,7 +171,7 @@ class MaskGraphQLDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -228,7 +228,7 @@ class MaskTextToGraphQLDatasetSyntheticData(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
         for example in data:
 
@@ -309,7 +309,7 @@ class SpiderDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -392,7 +392,7 @@ class CoSQLMaskDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 10]
+            data = data[:len(data) // 5]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
