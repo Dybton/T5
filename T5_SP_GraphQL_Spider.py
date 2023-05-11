@@ -37,14 +37,17 @@ from functools import reduce
 
 import itertools
 
-torch.manual_seed(0)
+# Fixing the random seeds for reproducibility, and to compare performance across differnet modifications
+torch.manual_seed(42)
+torch.cuda.manual_seed_all(42)
+np.random.seed(42)
+random.seed(42)
 
 import json
 from pathlib import Path
 from os.path import basename
 import glob
 from functools import reduce
-
 
 print("my version of pl is " + pl.__version__)
 
@@ -60,7 +63,7 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "synthetic_mirror_3000.json"
+train_set = "synthetic_mirror_1500.json"
 
 # In[3]:
 
@@ -684,7 +687,7 @@ class T5MultiSPModel(pl.LightningModule):
     return collated_batch
 
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.custom_collate_fn, num_workers=32)
 
   def val_dataloader(self):
     return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
