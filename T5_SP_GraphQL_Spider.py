@@ -39,7 +39,7 @@ import itertools
 
 # Fixing the random seeds for reproducibility, and to compare performance across differnet modifications
 torch.manual_seed(42)
-torch.cuda.manual_seed_all(42)
+# torch.cuda.manual_seed_all(42)
 np.random.seed(42)
 random.seed(42)
 
@@ -56,7 +56,7 @@ import pytorch_lightning
 
 print("my version of transformers is " + transformers.__version__)
 print ("my version of pytorch is " + torch.__version__)
-print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
+print("my version of pytorch_lightning is " + pytorch_lightning.__version__)
 
 # In[2]:
 
@@ -108,7 +108,7 @@ class TextToGraphQLDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 5]
+            data = data[:len(data) // 10]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -171,7 +171,7 @@ class MaskGraphQLDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 5]
+            data = data[:len(data) // 10]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -223,6 +223,12 @@ class MaskTextToGraphQLDatasetSyntheticData(Dataset):
       path = './SPEGQL-dataset/dataset/' + type_path
       with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
+
+        if(dev_mode):
+            random.seed(42)
+            
+            random.shuffle(data)
+            data = data[:len(data) // 10]
 
         for example in data:
 
@@ -303,7 +309,7 @@ class SpiderDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 5]
+            data = data[:len(data) // 10]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -386,7 +392,7 @@ class CoSQLMaskDataset(Dataset):
             random.seed(42)
             
             random.shuffle(data)
-            data = data[:len(data) // 5]
+            data = data[:len(data) // 10]
 
             # Print the first 3 data points
             #print("First 3 data points:", data[:3])
@@ -687,7 +693,7 @@ class T5MultiSPModel(pl.LightningModule):
     return collated_batch
 
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.custom_collate_fn, num_workers=32)
 
   def val_dataloader(self):
     return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
