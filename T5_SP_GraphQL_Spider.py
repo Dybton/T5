@@ -38,10 +38,10 @@ from functools import reduce
 import itertools
 
 # Fixing the random seeds for reproducibility, and to compare performance across differnet modifications
-torch.manual_seed(42)
+torch.manual_seed(0)
 # torch.cuda.manual_seed_all(42)
-np.random.seed(42)
-random.seed(42)
+# np.random.seed(42)
+# random.seed(42)
 
 import json
 from pathlib import Path
@@ -62,7 +62,7 @@ print("my version of pytorch_lightning is " + pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-dev_mode = True
+dev_mode = False
 train_set = "synthetic_mirror_1500.json"
 
 # In[3]:
@@ -693,7 +693,7 @@ class T5MultiSPModel(pl.LightningModule):
     return collated_batch
 
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.custom_collate_fn, num_workers=32)
+    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.custom_collate_fn, num_workers=32)
 
   def val_dataloader(self):
     return DataLoader(self.val_dataset, batch_size=self.batch_size, collate_fn=self.custom_collate_fn, num_workers=32)
@@ -768,7 +768,7 @@ trainer = pl.Trainer(logger=logger)
 # Pass the logger and checkpoint_callback to the Trainer
 trainer = pl.Trainer(callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}.ckpt"
+initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}1.ckpt"
 
 if not os.path.isfile(initial_training_checkpoint_path):
     # Train the model if checkpoint does not exist
@@ -811,7 +811,7 @@ fine_tuning_checkpoint_callback = ModelCheckpoint(
 trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
 
 
-fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}.ckpt"
+fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}1.ckpt"
 
 
 if not os.path.isfile(fine_tuning_checkpoint_path):
