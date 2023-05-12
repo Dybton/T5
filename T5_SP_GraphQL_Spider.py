@@ -5,7 +5,6 @@ print("my version of transformers is " + transformers.__version__)
 # In[31]:
 import transformers
 print("my version of transformers is " + transformers.__version__)
-import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler, ConcatDataset
@@ -39,9 +38,8 @@ import itertools
 
 # Fixing the random seeds for reproducibility, and to compare performance across differnet modifications
 torch.manual_seed(0)
-# torch.cuda.manual_seed_all(42)
-# np.random.seed(42)
-# random.seed(42)
+torch.cuda.manual_seed_all(42)
+random.seed(42)
 
 import json
 from pathlib import Path
@@ -62,7 +60,7 @@ print("my version of pytorch_lightning is " + pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-dev_mode = False
+dev_mode = True
 train_set = "synthetic_mirror_1500.json"
 
 # In[3]:
@@ -745,14 +743,13 @@ torch.manual_seed(42)
 
 hyperparams = argparse.Namespace(**{'lr': 0.0004365158322401656}) # for 3 epochs
 
-system = T5MultiSPModel(hyperparams,batch_size=2)
+system = T5MultiSPModel(hyperparams,batch_size=16)
 print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 
 # Initialize the logger
 logger = TensorBoardLogger("lightning_logs/")
 
 ## Initial Training
-
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Create a ModelCheckpoint callback
@@ -768,7 +765,7 @@ trainer = pl.Trainer(logger=logger)
 # Pass the logger and checkpoint_callback to the Trainer
 trainer = pl.Trainer(callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}1.ckpt"
+initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}1test.ckpt"
 
 if not os.path.isfile(initial_training_checkpoint_path):
     # Train the model if checkpoint does not exist
@@ -810,9 +807,7 @@ fine_tuning_checkpoint_callback = ModelCheckpoint(
 # Pass the new checkpoint_callback to the Trainer
 trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
 
-
-fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}1.ckpt"
-
+fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}1test.ckpt"
 
 if not os.path.isfile(fine_tuning_checkpoint_path):
     # Fine-tune the model if checkpoint does not exist
@@ -883,6 +878,8 @@ system.num_beams = 3
 system.task='finetune'
 system.test_flag = 'graphql'
 system.prepare_data() # We are fine tuning should come after the we have reached the testing phase.
+
+model.eval()
 
 print("Before calling trainer.test, test_dataset is:", system.test_dataset)
 trainer.test(model=system)
