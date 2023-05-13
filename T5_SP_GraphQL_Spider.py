@@ -879,7 +879,7 @@ system.task='finetune'
 system.test_flag = 'graphql'
 system.prepare_data() # We are fine tuning should come after the we have reached the testing phase.
 
-model.eval()
+system.eval()
 
 print("Before calling trainer.test, test_dataset is:", system.test_dataset)
 trainer.test(model=system)
