@@ -3,9 +3,10 @@
 #SBATCH --job-name=t5-spider-gpu    # Job name
 #SBATCH --output=job.%j.out         # Name of output file (%j expands to jobId)
 #SBATCH --cpus-per-task=8           # Schedule 8 cores (includes hyperthreading)
-#SBATCH --gres=gpu:tesla_v100:2      # Schedule a GPU
+#SBATCH --gres=gpu:rtx_8000:2       # Request 2x RTX 8000 GPUs
 #SBATCH --partition=brown           # Run on either the red or brown queue
 #SBATCH --time=5:00:00              # Set the time limit to 5 hours
+#SBATCH --nodelist=desktop17        # Specify the node to use
 
 echo "Running on $(hostname):"
 
