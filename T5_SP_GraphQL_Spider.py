@@ -5,6 +5,7 @@ print("my version of transformers is " + transformers.__version__)
 # In[31]:
 import transformers
 print("my version of transformers is " + transformers.__version__)
+import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler, ConcatDataset
@@ -51,14 +52,14 @@ import pytorch_lightning
 
 print("my version of transformers is " + transformers.__version__)
 print ("my version of pytorch is " + torch.__version__)
-print("my version of pytorch_lightning is " + pytorch_lightning.__version__)
+print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 # In[2]:
 
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "synthetic_mirror_1500.json"
+train_set = "synthetic_mirror_3000.json"
 
 # In[3]:
 
@@ -218,12 +219,6 @@ class MaskTextToGraphQLDatasetSyntheticData(Dataset):
       path = './SPEGQL-dataset/dataset/' + type_path
       with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
-
-        if(dev_mode):
-            random.seed(42)
-            
-            random.shuffle(data)
-            data = data[:len(data) // 5]
 
         for example in data:
 
