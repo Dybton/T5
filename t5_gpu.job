@@ -2,11 +2,10 @@
 
 #SBATCH --job-name=t5-spider-gpu
 #SBATCH --output=job.%j.out
-#SBATCH --cpus-per-task=8 
-#SBATCH --gres=gpu         
-#SBATCH --time=5:00:00 
-#SBATCH --partition=red,brown
-#SBATCH --nodelist=cn3, cn4, cn5, cn6, cn8, desktop17, desktop18
+#SBATCH --cpus-per-task=16 
+#SBATCH --gres=gpu:v100:1
+#SBATCH --time=24:00:00
+#SBATCH --partition=red
 
 echo "Running on $(hostname):"
 
