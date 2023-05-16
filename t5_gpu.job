@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu         
 #SBATCH --time=5:00:00 
 #SBATCH --partition=red,brown
-#SBATCH --nodelist=cn3, cn4, cn5, cn6, cn8, desktop17, desktop18
+#SBATCH --nodelist=cn4, cn5, cn6, cn8, desktop17, desktop18
 
 echo "Running on $(hostname):"
 
