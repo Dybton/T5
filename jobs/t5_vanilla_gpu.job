@@ -12,6 +12,7 @@ echo "Running on $(hostname):"
 
 source /home/jato/venv/bin/activate
 
+
 nvidia-smi
 
 python T5_SP_GraphQL_Spider_vanilla.py
