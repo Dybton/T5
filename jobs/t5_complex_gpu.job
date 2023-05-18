@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu
 #SBATCH --time=05:00:00
-#SBATCH --partition=brown
-#SBATCH --nodelist=desktop18, desktop17
+#SBATCH --partition=brown, red
+#SBATCH --nodelist=desktop18, desktop17, cn3, cn4, cn5, cn8
 
 echo "Running on $(hostname):"
 
