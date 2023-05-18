@@ -59,7 +59,7 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "synethetic_mirror_1500.json"
+train_set = "synthetic_mirror_1500.json"
 
 # In[3]:
 
