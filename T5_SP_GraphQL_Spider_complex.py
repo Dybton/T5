@@ -59,7 +59,7 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "vanilla"
+train_set = "synethetic_complex_1500.json"
 
 # In[3]:
 
@@ -644,14 +644,13 @@ class T5MultiSPModel(pl.LightningModule):
 
       self.train_dataset = ConcatDataset([self.train_dataset_g,self.train_dataset_s])
       self.val_dataset = ConcatDataset([self.val_dataset_g, self.val_dataset_s])
-      self.test_dataset = ConcatDataset([self.test_dataset_g, self.test_dataset_s])
       if self.test_flag == 'graphql':
         self.test_dataset = self.test_dataset_g
       else:
         self.test_dataset = self.test_dataset_s
     
     else:
-      #train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
+      train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
       train_dataset_g = MaskGraphQLDataset(self.tokenizer)
       val_dataset_g = MaskGraphQLDataset(self.tokenizer, type_path='dev.json')
 
@@ -659,7 +658,6 @@ class T5MultiSPModel(pl.LightningModule):
       val_dataset_s = CoSQLMaskDataset(self.tokenizer, type_path='cosql_dev.json')
 
       self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s, train_dataset_synth])
-      # self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
   @staticmethod

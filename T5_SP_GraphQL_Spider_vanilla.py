@@ -106,11 +106,6 @@ class TextToGraphQLDataset(Dataset):
             random.shuffle(data)
             data = data[:len(data) // 5]
 
-            # Print the first 3 data points
-            #print("First 3 data points:", data[:3])
-
-          #print("Number of data points:", len(data))
-
           for element in data:
             question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']])
             tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, padding=True, truncation=True, return_tensors='pt')
@@ -169,11 +164,6 @@ class MaskGraphQLDataset(Dataset):
             random.shuffle(data)
             data = data[:len(data) // 5]
 
-            # Print the first 3 data points
-            #print("First 3 data points:", data[:3])
-
-          #print("Number of data points:", len(data))
-
           for example in data:
 
             utterance = example['query']
@@ -206,53 +196,6 @@ class MaskGraphQLDataset(Dataset):
         target_id = self.target[index]
         return { 'source_ids': source_ids,
                 'target_id': target_id}
-
-
-class MaskTextToGraphQLDatasetSyntheticData(Dataset):
-  def __init__(self, tokenizer, type_path=train_set, block_size=64):
-      'Initialization'
-      super(MaskTextToGraphQLDatasetSyntheticData, ).__init__()
-      self.tokenizer = tokenizer
-
-      self.source = []
-      self.target = []
-      path = './SPEGQL-dataset/dataset/' + type_path
-      with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-        for example in data:
-
-          utterance = example['query']
-          encoded_source = tokenizer.encode(utterance, max_length=block_size, padding='max_length', truncation=True, return_tensors='pt').squeeze()
-          token_count = encoded_source.shape[0]
-          repeated_utterance = [encoded_source for _ in range(token_count)]
-          for pos in range(1, token_count):
-            encoded_source = repeated_utterance[pos].clone()
-            target_id = encoded_source[pos].item()
-            if target_id == tokenizer.eos_token_id:
-                break
-            encoded_source[pos] = tokenizer.mask_token_id
-            decoded_target = ''.join(tokenizer.convert_ids_to_tokens([target_id]))
-            encoded_target = tokenizer.encode(decoded_target, return_tensors='pt', max_length=4, padding='max_length', truncation=True).squeeze()
-            if encoded_target is not None and torch.numel(encoded_target) > 0:
-                self.target.append(encoded_target)
-                self.source.append(encoded_source)
-            if torch.numel(encoded_target) > 0:
-                self.target.append(encoded_target)
-                self.source.append(encoded_source)
-
-  def __len__(self):
-        'Denotes the total number of samples'
-        return len(self.source)
-
-  def __getitem__(self, index):
-        'Generates one sample of data'
-        source_ids = self.source[index]
-        target_id = self.target[index]
-        return { 'source_ids': source_ids,
-                'target_id': target_id}
-
-# # In[36]:
 
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
@@ -644,22 +587,19 @@ class T5MultiSPModel(pl.LightningModule):
 
       self.train_dataset = ConcatDataset([self.train_dataset_g,self.train_dataset_s])
       self.val_dataset = ConcatDataset([self.val_dataset_g, self.val_dataset_s])
-      self.test_dataset = ConcatDataset([self.test_dataset_g, self.test_dataset_s])
       if self.test_flag == 'graphql':
         self.test_dataset = self.test_dataset_g
       else:
         self.test_dataset = self.test_dataset_s
     
     else:
-      #train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
       train_dataset_g = MaskGraphQLDataset(self.tokenizer)
       val_dataset_g = MaskGraphQLDataset(self.tokenizer, type_path='dev.json')
 
       train_dataset_s = CoSQLMaskDataset(self.tokenizer)
       val_dataset_s = CoSQLMaskDataset(self.tokenizer, type_path='cosql_dev.json')
 
-      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s, train_dataset_synth])
-      # self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
+      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
   @staticmethod
@@ -823,41 +763,6 @@ hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenizati
 print("hyps")
 print(hyps)
 
-# FINE TUNING WITH SYNTHETIC DATA
-
-# # Fine Tuning with synthetic dataset
-# system.task = 'synthetic'
-# system.batch_size = 2 # adjust batch size if needed
-# system.hyperparams.lr = 0.0005248074602497723 # you can adjust learning rate if needed
-
-# system.prepare_data() # Load the synthetic dataset
-
-# # Create another ModelCheckpoint callback for synthetic fine-tuning
-# synthetic_fine_tuning_checkpoint_callback = ModelCheckpoint(
-#     monitor='val_loss',
-#     dirpath=os.path.join(script_dir, 'checkpoints'),
-#     filename='synthetic_fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
-#     save_top_k=1,
-#     mode='min',
-# )
-
-# # Pass the new checkpoint_callback to the Trainer
-# trainer = Trainer(gpus=1, max_epochs=2, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[synthetic_fine_tuning_checkpoint_callback])
-
-# synthetic_fine_tuning_checkpoint_path = "checkpoints/last_synthetic_fine_tuned_checkpoint.ckpt"
-
-# if not os.path.isfile(synthetic_fine_tuning_checkpoint_path):
-#     # Fine-tune the model with synthetic dataset if checkpoint does not exist
-#     trainer.fit(system)
-#     # Save the last synthetic fine-tuned checkpoint
-#     trainer.save_checkpoint(synthetic_fine_tuning_checkpoint_path)
-# else:
-#     print("Loading synthetic fine-tuned checkpoint...")
-
-# # Load the best synthetic fine-tuned model for testing
-# system = system.load_from_checkpoint(synthetic_fine_tuning_checkpoint_path, hyperparams=hyperparams)
-# system.task = 'synthetic'
-# system.prepare_data() # Re added this to make sure the val_dataset attribute of the best_synthetic_fine_tuned_model object is not None.
 
 ## Testing
 
