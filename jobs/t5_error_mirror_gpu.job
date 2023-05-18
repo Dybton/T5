@@ -14,6 +14,7 @@ source /home/jato/venv/bin/activate
 
 nvidia-smi
 
-python /home/jato/T5/T5_SP_GraphQL_Spider_error_mirror.py
+cd /home/jato/T5/
+python T5_SP_GraphQL_Spider_error_mirror.py
 
 deactivate
