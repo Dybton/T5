@@ -60,7 +60,7 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "vanilla"
-checkpoint_number = 5
+checkpoint_number = 1
 
 # In[3]:
 
