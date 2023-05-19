@@ -59,7 +59,7 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "synthetic_mirror_3000.json"
+train_set = "synthetic_mirror_1500.json"
 
 # In[3]:
 
@@ -752,7 +752,9 @@ trainer = pl.Trainer(logger=logger)
 # Pass the logger and checkpoint_callback to the Trainer
 trainer = pl.Trainer(callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}2.ckpt"
+checkpoint_number = 3
+
+initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}{checkpoint_number}.ckpt"
 
 if not os.path.isfile(initial_training_checkpoint_path):
     # Train the model if checkpoint does not exist
@@ -794,7 +796,7 @@ fine_tuning_checkpoint_callback = ModelCheckpoint(
 # Pass the new checkpoint_callback to the Trainer
 trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
 
-fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}2.ckpt"
+fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}{checkpoint_number}.ckpt"
 
 if not os.path.isfile(fine_tuning_checkpoint_path):
     # Fine-tune the model if checkpoint does not exist
