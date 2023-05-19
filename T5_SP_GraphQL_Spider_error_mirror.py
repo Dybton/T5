@@ -60,6 +60,7 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "synthetic_mirror_3000.json"
+checkpoint_number = 3
 
 # In[3]:
 
@@ -751,8 +752,6 @@ trainer = pl.Trainer(logger=logger)
 
 # Pass the logger and checkpoint_callback to the Trainer
 trainer = pl.Trainer(callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
-
-checkpoint_number = 2
 
 initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}{checkpoint_number}.ckpt"
 
