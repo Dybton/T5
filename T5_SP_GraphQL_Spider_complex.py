@@ -60,7 +60,7 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "synthetic_complex_3000.json"
-checkpoint_number = 1
+checkpoint_number = 2
 
 # In[3]:
 
