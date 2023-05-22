@@ -59,8 +59,8 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "synthetic_complex_4500.json"
-checkpoint_number = 3
+train_set = "synthetic_complex_1500.json"
+checkpoint_number = 2
 
 # In[3]:
 
