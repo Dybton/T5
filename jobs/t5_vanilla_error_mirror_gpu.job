@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=t5-spider-gpu-vanilla-mirror
+#SBATCH --job-name=t5-spider-gpu-vanilla-error-mirror
 #SBATCH --output=job.%j.out
 #SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu
@@ -15,6 +15,6 @@ source /home/jato/venv/bin/activate
 nvidia-smi
 
 cd /home/jato/T5/
-python T5_SP_GraphQL_Spider_vanilla_mirror.py
+python T5_SP_GraphQL_Spider_vanilla_error_mirror.py
 
 deactivate
