@@ -55,12 +55,13 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 # In[2]:
 
-#torch.manual_seed(0)
+
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "synthetic_mirror_4500.json"
-checkpoint_number = 3
+train_set = "synthetic_mirror_1500.json"
+checkpoint_number = 4
+torch.manual_seed(checkpoint_number)
 
 # In[3]:
 
