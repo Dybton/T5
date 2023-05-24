@@ -37,8 +37,6 @@ from functools import reduce
 
 import itertools
 
-torch.manual_seed(0)
-
 import json
 from pathlib import Path
 from os.path import basename
@@ -59,8 +57,9 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 test_state = False
 tensorflow_active = False
 dev_mode = False
-train_set = "synthetic_complex_4500.json"
-checkpoint_number = 3
+train_set = "synthetic_complex_1500.json"
+checkpoint_number = 4
+torch.manual_seed(checkpoint_number)
 
 # In[3]:
 
