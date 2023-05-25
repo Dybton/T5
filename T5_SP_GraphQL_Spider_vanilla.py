@@ -37,8 +37,6 @@ from functools import reduce
 
 import itertools
 
-torch.manual_seed(0)
-
 import json
 from pathlib import Path
 from os.path import basename
@@ -60,8 +58,8 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "vanilla"
-checkpoint_number = 1
-
+checkpoint_number = 5
+torch.manual_seed(checkpoint_number)
 # In[3]:
 
 class TextToGraphQLDataset(Dataset):
