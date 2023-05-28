@@ -60,8 +60,7 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "synthetic_mirror_4500.json"
-checkpoint_number = 4
-torch.manual_seed(checkpoint_number)
+checkpoint_number = 5
 
 # In[3]:
 
