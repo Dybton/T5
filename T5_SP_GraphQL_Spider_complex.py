@@ -58,8 +58,8 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "synthetic_complex_4500.json"
-checkpoint_number = 6
-torch.manual_seed(checkpoint_number)
+checkpoint_number = 7
+# torch.manual_seed(checkpoint_number)
 
 # In[3]:
 
