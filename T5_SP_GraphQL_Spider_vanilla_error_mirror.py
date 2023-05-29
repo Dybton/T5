@@ -58,7 +58,7 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "vanilla_error_mirror_1500.json"
-checkpoint_number = 7
+checkpoint_number = 8
 torch.manual_seed(checkpoint_number)
 
 # In[3]:
