@@ -3,9 +3,9 @@
 #SBATCH --job-name=t5-spider-gpu-error-mirror
 #SBATCH --output=job.%j.out
 #SBATCH --cpus-per-task=16 
-#SBATCH --gres=gpu:v100:1
+#SBATCH --gres=gpu
 #SBATCH --time=5:00:00
-#SBATCH --partition=red
+#SBATCH --partition=brown
 
 echo "Running on $(hostname):"
 
