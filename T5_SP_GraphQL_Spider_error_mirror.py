@@ -60,7 +60,7 @@ test_state = False
 tensorflow_active = False
 dev_mode = False
 train_set = "synthetic_mirror_4500.json"
-checkpoint_number = 9
+checkpoint_number = 10
 
 # In[3]:
 
