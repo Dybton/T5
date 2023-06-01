@@ -106,11 +106,6 @@ class TextToGraphQLDataset(Dataset):
             random.shuffle(data)
             data = data[:len(data) // 5]
 
-            # Print the first 3 data points
-            #print("First 3 data points:", data[:3])
-
-          #print("Number of data points:", len(data))
-
           for element in data:
             question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']])
             tokenized_s = tokenizer.encode_plus(question_with_schema,max_length=1024, padding=True, truncation=True, return_tensors='pt')
@@ -251,12 +246,11 @@ class MaskTextToGraphQLDatasetSyntheticData(Dataset):
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
 
-    special_tokens_dict = tokenizer.special_tokens_map # the issue could be here, might need to copy.
+    special_tokens_dict = tokenizer.special_tokens_map
     special_tokens_dict['mask_token'] = '<mask>'
     special_tokens_dict['additional_special_tokens'] = ['<t>', '</t>', '<a>', '</a>']
     tokenizer.add_tokens(['{', '}', '<c>', '</c>'])
     tokenizer.add_special_tokens(special_tokens_dict)
-    #model.resize_token_embeddings(len(tokenizer))
 
     dataset = MaskGraphQLDataset(tokenizer=tokenizer, type_path='train.json', block_size=64)
     print("MaskGraphQLDataset test done")
@@ -272,16 +266,6 @@ class SpiderDataset(Dataset):
         self.target = []
         spider_path = './spider/'
         path = spider_path + type_path
-        # TODO open up tables.json
-        # its a list of tables
-        # group by db_id 
-        # grab column name from column_names_original ( each column name is a list of two. and the 2nd index {1} is the column name )
-        # grab table names from table_names (^ same as above )
-        # concat both with the english question (table names + <c> + column names + <q> english question)
-        # tokenize
-
-        # Maybe try making making more structure 
-        # in the concat by using primary_keys and foreign_keys 
 
         tables_path = spider_path + 'tables.json'
 
@@ -323,9 +307,6 @@ class SpiderDataset(Dataset):
             # question_with_schema = 'translate English to GraphQL: ' + element['question']  + ' ' + ' '.join(self.name_to_schema[element['schemaId']]) + ' </s>'
 
             tokenized_s = tokenizer.batch_encode_plus([db_with_question],max_length=1024, padding='max_length', truncation=True,return_tensors='pt')
-            # what is the largest example size?
-            # the alternative is to collate
-            #might need to collate
             self.source.append(tokenized_s)
 
             tokenized_t = tokenizer.batch_encode_plus([element['query']],max_length=block_size, padding='max_length', truncation=True,return_tensors='pt')
@@ -416,12 +397,11 @@ class CoSQLMaskDataset(Dataset):
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
 
-    special_tokens_dict = tokenizer.special_tokens_map # the issue could be here, might need to copy.
+    special_tokens_dict = tokenizer.special_tokens_map 
     special_tokens_dict['mask_token'] = '<mask>'
     special_tokens_dict['additional_special_tokens'] = ['<t>', '</t>', '<a>', '</a>']
     tokenizer.add_tokens(['{', '}', '<c>', '</c>'])
     tokenizer.add_special_tokens(special_tokens_dict)
-    #model.resize_token_embeddings(len(tokenizer))
 
     dataset = CoSQLMaskDataset(tokenizer=tokenizer , type_path='cosql_train.json', block_size=64)
 
@@ -450,7 +430,7 @@ class T5MultiSPModel(pl.LightningModule):
     if self.task == 'finetune':
       self.model = T5ForConditionalGeneration.from_pretrained('t5-base')
     else: 
-      self.model = T5ForConditionalGeneration.from_pretrained('t5-base') # no output past? 
+      self.model = T5ForConditionalGeneration.from_pretrained('t5-base') 
 
     self.tokenizer = T5Tokenizer.from_pretrained('t5-base')
     
@@ -470,7 +450,7 @@ class T5MultiSPModel(pl.LightningModule):
 
   def add_special_tokens(self):
     # new special tokens
-    special_tokens_dict = self.tokenizer.special_tokens_map # the issue could be here, might need to copy.
+    special_tokens_dict = self.tokenizer.special_tokens_map
     special_tokens_dict['mask_token'] = '<mask>'
     special_tokens_dict['additional_special_tokens'] = ['<t>', '</t>', '<a>', '</a>']
     self.tokenizer.add_tokens(['{', '}', '<c>', '</c>'])
@@ -524,11 +504,7 @@ class T5MultiSPModel(pl.LightningModule):
         return
     print("outputs " + str(outputs))
     avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
-    # if self.task == 'finetune':
-    #   avg_acc = torch.stack([x["val_acc"] for x in outputs]).mean()
-    #   tensorboard_logs = {"val_loss": avg_loss, "avg_val_acc": avg_acc}
-    #   return {"progress_bar": tensorboard_logs, "log": tensorboard_logs}
-    # else:
+
     tensorboard_logs = {"val_loss": avg_loss}
     return {'progress_bar': tensorboard_logs, 'log': tensorboard_logs }
 
@@ -586,9 +562,6 @@ class T5MultiSPModel(pl.LightningModule):
     else:
       return {"test_loss": loss, "preds": preds, "target": target }
 
-  # def test_end(self, outputs):
-  #   return self.validation_end(outputs)
-
   def test_epoch_end(self, outputs):
     avg_loss = torch.stack([x["test_loss"] for x in outputs]).mean()
     self.log("avg_test_loss", avg_loss, prog_bar=True)
@@ -625,14 +598,14 @@ class T5MultiSPModel(pl.LightningModule):
         self.test_dataset = self.test_dataset_s
     
     else:
-      #train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
+      train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer) # My addition
       train_dataset_g = MaskGraphQLDataset(self.tokenizer)
       val_dataset_g = MaskGraphQLDataset(self.tokenizer, type_path='dev.json')
 
       train_dataset_s = CoSQLMaskDataset(self.tokenizer)
       val_dataset_s = CoSQLMaskDataset(self.tokenizer, type_path='cosql_dev.json')
 
-      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s, train_dataset_synth])
+      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s, train_dataset_synth]) # My addition
       # self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
@@ -802,7 +775,7 @@ print("We have reached the testing phase")
 system.num_beams = 3
 system.task='finetune'
 system.test_flag = 'graphql'
-system.prepare_data() # We are fine tuning should come after the we have reached the testing phase.
+system.prepare_data()
 
 print("Before calling trainer.test, test_dataset is:", system.test_dataset)
 trainer.test(model=system)
