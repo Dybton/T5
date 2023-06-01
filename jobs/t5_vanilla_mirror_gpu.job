@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --job-name=t5-spider-gpu-vanilla-mirror
+#SBATCH --output=job.%j.out
+#SBATCH --cpus-per-task=16 
+#SBATCH --gres=gpu
+#SBATCH --time=5:00:00
+#SBATCH --partition=brown
+
+echo "Running on $(hostname):"
+
+source /home/jato/venv/bin/activate
+
+nvidia-smi
+
+cd /home/jato/T5/
+python T5_SP_GraphQL_Spider_vanilla_mirror.py
+
+deactivate
