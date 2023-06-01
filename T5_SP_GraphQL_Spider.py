@@ -169,11 +169,6 @@ class MaskGraphQLDataset(Dataset):
             random.shuffle(data)
             data = data[:len(data) // 5]
 
-            # Print the first 3 data points
-            #print("First 3 data points:", data[:3])
-
-          #print("Number of data points:", len(data))
-
           for example in data:
 
             utterance = example['query']
@@ -253,7 +248,6 @@ class MaskTextToGraphQLDatasetSyntheticData(Dataset):
                 'target_id': target_id}
 
 # # In[36]:
-
 if test_state:
     tokenizer = AutoTokenizer.from_pretrained("t5-base")
 
@@ -300,11 +294,6 @@ class SpiderDataset(Dataset):
             
             random.shuffle(data)
             data = data[:len(data) // 5]
-
-            # Print the first 3 data points
-            #print("First 3 data points:", data[:3])
-
-          #print("Number of data points:", len(data))
 
           #groupby db_id 
           grouped_dbs = {}
@@ -382,11 +371,6 @@ class CoSQLMaskDataset(Dataset):
             
             random.shuffle(data)
             data = data[:len(data) // 5]
-
-            # Print the first 3 data points
-            #print("First 3 data points:", data[:3])
-
-          #print("Number of data points:", len(data))
 
           for element in data:
             for interaction in element['interaction']:
@@ -547,16 +531,6 @@ class T5MultiSPModel(pl.LightningModule):
     # else:
     tensorboard_logs = {"val_loss": avg_loss}
     return {'progress_bar': tensorboard_logs, 'log': tensorboard_logs }
-    
-
-  # def optimizer_step(self, epoch, batch_idx, optimizer, optimizer_idx, second_order_closure=None):
-  #   if self.trainer:
-  #     xm.optimizer_step(optimizer)
-  #   else:
-  #     optimizer.step()
-  #   optimizer.zero_grad()
-  #   self.lr_scheduler.step()
-
 
   def configure_optimizers(self):
     t_total = len(self.train_dataloader()) * self.trainer.max_epochs * self.trainer.limit_train_batches
@@ -822,44 +796,6 @@ hyps = [system.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenizati
 
 print("hyps")
 print(hyps)
-
-# FINE TUNING WITH SYNTHETIC DATA
-
-# # Fine Tuning with synthetic dataset
-# system.task = 'synthetic'
-# system.batch_size = 2 # adjust batch size if needed
-# system.hyperparams.lr = 0.0005248074602497723 # you can adjust learning rate if needed
-
-# system.prepare_data() # Load the synthetic dataset
-
-# # Create another ModelCheckpoint callback for synthetic fine-tuning
-# synthetic_fine_tuning_checkpoint_callback = ModelCheckpoint(
-#     monitor='val_loss',
-#     dirpath=os.path.join(script_dir, 'checkpoints'),
-#     filename='synthetic_fine_tuned_model-{epoch:02d}-{val_loss:.2f}',
-#     save_top_k=1,
-#     mode='min',
-# )
-
-# # Pass the new checkpoint_callback to the Trainer
-# trainer = Trainer(gpus=1, max_epochs=2, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[synthetic_fine_tuning_checkpoint_callback])
-
-# synthetic_fine_tuning_checkpoint_path = "checkpoints/last_synthetic_fine_tuned_checkpoint.ckpt"
-
-# if not os.path.isfile(synthetic_fine_tuning_checkpoint_path):
-#     # Fine-tune the model with synthetic dataset if checkpoint does not exist
-#     trainer.fit(system)
-#     # Save the last synthetic fine-tuned checkpoint
-#     trainer.save_checkpoint(synthetic_fine_tuning_checkpoint_path)
-# else:
-#     print("Loading synthetic fine-tuned checkpoint...")
-
-# # Load the best synthetic fine-tuned model for testing
-# system = system.load_from_checkpoint(synthetic_fine_tuning_checkpoint_path, hyperparams=hyperparams)
-# system.task = 'synthetic'
-# system.prepare_data() # Re added this to make sure the val_dataset attribute of the best_synthetic_fine_tuned_model object is not None.
-
-## Testing
 
 print("We have reached the testing phase")
 
