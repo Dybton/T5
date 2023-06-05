@@ -58,8 +58,9 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-dev_mode = False
-train_set = "vanilla"
+dev_mode = True
+train_set = "synthetic_mirror_1500.json"
+train_round = 20
 
 # In[3]:
 
@@ -596,17 +597,22 @@ class T5MultiSPModel(pl.LightningModule):
         self.test_dataset = self.test_dataset_g
       else:
         self.test_dataset = self.test_dataset_s
-    
-    else:
-      train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer) # My addition
+
+    if self.task == 'mask1':
+      train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
+      val_dataset_g = MaskGraphQLDataset(self.tokenizer, type_path='dev.json')
+
+      self.train_dataset = ConcatDataset([train_dataset_synth])
+      self.val_dataset = ConcatDataset([val_dataset_g])
+  
+    elif self.task == 'mask2':
       train_dataset_g = MaskGraphQLDataset(self.tokenizer)
       val_dataset_g = MaskGraphQLDataset(self.tokenizer, type_path='dev.json')
 
       train_dataset_s = CoSQLMaskDataset(self.tokenizer)
       val_dataset_s = CoSQLMaskDataset(self.tokenizer, type_path='cosql_dev.json')
 
-      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s, train_dataset_synth]) # My addition
-      # self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
+      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_s])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
 
   @staticmethod
@@ -685,8 +691,37 @@ print("We initialize the T5MultiSPModel(hyperparams,batch_size=32)")
 # Initialize the logger
 logger = TensorBoardLogger("lightning_logs/")
 
-## Initial Training
+## Initialize the script dir
 script_dir = os.path.dirname(os.path.realpath(__file__))
+
+system.task = 'mask1'
+system.prepare_data()
+
+# Masked 1 Training 
+masked_training_checkpoint_path = ModelCheckpoint(
+    monitor='val_loss',
+    dirpath=os.path.join(script_dir, 'checkpoints'),
+    filename='model-{epoch:02d}-{val_loss:.2f}',
+    save_top_k=1,
+    mode='min',
+)
+
+trainer = pl.Trainer(callbacks=[masked_training_checkpoint_path], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
+
+masked_training_checkpoint_path = f"checkpoints/masked_training_checkpoint_{train_set}{train_round}.ckpt"
+
+if not os.path.isfile(masked_training_checkpoint_path):
+    # Train the model if checkpoint does not exist
+    trainer.fit(system)
+    # Save the last masked training checkpoint
+    trainer.save_checkpoint(masked_training_checkpoint_path)
+
+
+system = system.load_from_checkpoint(masked_training_checkpoint_path, hyperparams=hyperparams)
+
+# Initial training
+system.task = 'mask2'
+system.prepare_data()
 
 # Create a ModelCheckpoint callback
 checkpoint_callback = ModelCheckpoint(
@@ -701,7 +736,7 @@ trainer = pl.Trainer(logger=logger)
 # Pass the logger and checkpoint_callback to the Trainer
 trainer = pl.Trainer(callbacks=[checkpoint_callback], accelerator='gpu', max_epochs=1, log_every_n_steps=1, limit_train_batches=0.2, gpus=1)
 
-initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}1.ckpt"
+initial_training_checkpoint_path = f"checkpoints/training_checkpoint_{train_set}{train_round}.ckpt"
 
 if not os.path.isfile(initial_training_checkpoint_path):
     # Train the model if checkpoint does not exist
@@ -743,7 +778,7 @@ fine_tuning_checkpoint_callback = ModelCheckpoint(
 # Pass the new checkpoint_callback to the Trainer
 trainer = Trainer(gpus=1, max_epochs=6, progress_bar_refresh_rate=1, val_check_interval=0.5, callbacks=[fine_tuning_checkpoint_callback])
 
-fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}1.ckpt"
+fine_tuning_checkpoint_path = f"checkpoints/fine_tuned_checkpoint_{train_set}{train_round}.ckpt"
 
 if not os.path.isfile(fine_tuning_checkpoint_path):
     # Fine-tune the model if checkpoint does not exist
