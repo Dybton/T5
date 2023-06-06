@@ -60,7 +60,7 @@ test_state = False
 tensorflow_active = False
 dev_mode = True
 train_set = "synthetic_mirror_1500.json"
-train_round = 20
+train_round = 21
 
 # In[3]:
 
