@@ -58,9 +58,9 @@ print("my version of pytorch_lightning is " +pytorch_lightning.__version__)
 
 test_state = False
 tensorflow_active = False
-dev_mode = True
+dev_mode = False
 train_set = "synthetic_mirror_1500.json"
-train_round = 21
+train_round = 23
 
 # In[3]:
 
@@ -602,8 +602,8 @@ class T5MultiSPModel(pl.LightningModule):
       train_dataset_synth = MaskTextToGraphQLDatasetSyntheticData(self.tokenizer)
       val_dataset_g = MaskGraphQLDataset(self.tokenizer, type_path='dev.json')
 
-      self.train_dataset = ConcatDataset([train_dataset_synth])
-      self.val_dataset = ConcatDataset([val_dataset_g])
+      self.train_dataset = train_dataset_synth
+      self.val_dataset = val_dataset_g
   
     elif self.task == 'mask2':
       train_dataset_g = MaskGraphQLDataset(self.tokenizer)
