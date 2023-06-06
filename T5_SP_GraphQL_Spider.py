@@ -605,7 +605,7 @@ class T5MultiSPModel(pl.LightningModule):
       train_dataset_s = CoSQLMaskDataset(self.tokenizer)
       val_dataset_s = CoSQLMaskDataset(self.tokenizer, type_path='cosql_dev.json')
 
-      self.train_dataset = ConcatDataset([train_dataset_g, train_dataset_synth])
+      self.train_dataset = ConcatDataset([train_dataset_s, train_dataset_synth])
       self.val_dataset = ConcatDataset([val_dataset_g,val_dataset_s])
   
     elif self.task == 'mask2':
